@@ -41,8 +41,12 @@ recipients = df_Transplant %>%
   arrange(`Recipient Taxon`) %>% 
   pull()
 
+recipients # check which are rodents
+
 recipients = tibble(`Recipient Taxon` = recipients, Rodent.Recip = "Other")
-recipients[c(14,15,18,19,22), 2] = "Rodent"
+recipients[c(14,15,18,19,23), 2] = "Rodent"
+
+recipients %>% View()
 #TODO: after new import, check the above line if new recipient were added
 #TODO: if necessary, adjust numbers accordingly
 #TODO: discuss status of "woodrat"
@@ -51,8 +55,10 @@ recipients[c(14,15,18,19,22), 2] = "Rodent"
 df_Transplant = left_join(df_Transplant, recipients, by = "Recipient Taxon")
 
 df_Transplant %>% 
-  dplyr::select(`Recipient Taxon`, Rodent.Recip.y) %>% 
-  View() # check if conversion was done correctly
+  dplyr::select(`Recipient Taxon`, Rodent.Recip) %>% 
+  View() 
+# check if conversion was done correctly
+# easiest to do by sorting the Rodent column in the viewer
 
 ## create new rodent/other column ------
 
@@ -72,7 +78,7 @@ df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor != 'Rodent'] <- 'Other' #R
 ## Summary figures --------
 
 df_Transplant %>% 
-  dplyr::select(Rodent.Recip.y, starts_with("Eco-Reality")) %>% 
+  dplyr::select(Rodent.Recip, starts_with("Eco-Reality")) %>% 
   # select the relevant columns for the plotting function
   gather(starts_with("Eco-reality of"), key = "Type", value = "Eco-Reality") %>% 
   # create the long format for ease of plotting
@@ -82,12 +88,12 @@ df_Transplant %>%
   #TODO rerun after all the data are added/verified
   ggplot() +
   geom_histogram(aes(x = `Eco-Reality`, 
-                     fill = Rodent.Recip.y), 
+                     fill = Rodent.Recip), 
                  binwidth = 1) + 
   facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x") +
   #TODO: create shorter lables for the facet columns
   theme(legend.position = "top")
-  
+#TODO: check where warning "Rodent.Donor is coming from?  
 
 ## individual figures -------
 
