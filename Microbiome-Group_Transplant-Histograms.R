@@ -24,6 +24,9 @@ df_Transplant = gs_url("https://docs.google.com/spreadsheets/d/1WhRjoIFJWAAGvsFN
   write_csv(paste(Sys.Date(),"Microbiome_Literature_Summaries.csv")) 
 # and automatically create timestamped .csv for safety and repeatability
 
+## execute line below if you want to repeat analysis from a certain date
+# df_Transplant = read_csv("2018-11-20 Microbiome_Literature_Summaries.csv")
+
 attr(df_Transplant, "CreatedOn") = Sys.Date() 
 # add the same date as an attribute to the R object
 glimpse(df_Transplant)
@@ -43,42 +46,39 @@ recipients = df_Transplant %>%
 
 recipients # check which are rodents
 
-recipients = tibble(`Recipient Taxon` = recipients, Rodent.Recip = "Other")
-recipients[c(14,15,18,19,23), 2] = "Rodent"
-
+recipients = tibble(`Recipient Taxon` = recipients, LabRodent.Recip = "Other")
+recipients[c(14:16,19:20), 2] = "LabRodent"
 recipients %>% View()
 #TODO: after new import, check the above line if new recipient were added
 #TODO: if necessary, adjust numbers accordingly
-#TODO: discuss status of "woodrat"
 
 ## create new column with lookup table and left_join
 df_Transplant = left_join(df_Transplant, recipients, by = "Recipient Taxon")
 
 df_Transplant %>% 
-  dplyr::select(`Recipient Taxon`, Rodent.Recip) %>% 
+  dplyr::select(`Recipient Taxon`, LabRodent.Recip) %>% 
   View() 
 # check if conversion was done correctly
 # easiest to do by sorting the Rodent column in the viewer
 
-## create new rodent/other column ------
-
-df_Transplant$Rodent.Recip <- df_Transplant$`Recipient Taxon` #Create a new column identical to recipient taxon column
-df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'mouse'] <- 'Rodent' #Replace various lab rodent models with 'Rodent'
-df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'Mice'] <- 'Rodent'
-df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'rat'] <- 'Rodent'
-df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'rats'] <- 'Rodent'
-df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip != 'Rodent'] <- 'Other' #Replace all non-lab-rodent taxons to 'other'
-
-df_Transplant$Rodent.Donor <- df_Transplant$`Donor Taxon` #Create a new column identical to donor taxon column
-df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor == 'mouse'] <- 'Rodent' #Replace various lab rodent models with 'Rodent'
-df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor == 'rat'] <- 'Rodent'
-df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor != 'Rodent'] <- 'Other' #Replace all non-lab-rodent taxons to 'other'
-#TODO: use tidyverse to create these two vectors
+## create new rodent/other column individually # (>_<) ------
+# 
+# df_Transplant$Rodent.Recip <- df_Transplant$`Recipient Taxon` #Create a new column identical to recipient taxon column
+# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'mouse'] <- 'Rodent' #Replace various lab rodent models with 'Rodent'
+# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'Mice'] <- 'Rodent'
+# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'rat'] <- 'Rodent'
+# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'rats'] <- 'Rodent'
+# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip != 'Rodent'] <- 'Other' #Replace all non-lab-rodent taxons to 'other'
+# 
+# df_Transplant$Rodent.Donor <- df_Transplant$`Donor Taxon` #Create a new column identical to donor taxon column
+# df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor == 'mouse'] <- 'Rodent' #Replace various lab rodent models with 'Rodent'
+# df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor == 'rat'] <- 'Rodent'
+# df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor != 'Rodent'] <- 'Other' #Replace all non-lab-rodent taxons to 'other'
 
 ## Summary figures --------
 
 df_Transplant %>% 
-  dplyr::select(Rodent.Recip, starts_with("Eco-Reality")) %>% 
+  dplyr::select(LabRodent.Recip, starts_with("Eco-Reality")) %>% 
   # select the relevant columns for the plotting function
   gather(starts_with("Eco-reality of"), key = "Type", value = "Eco-Reality") %>% 
   # create the long format for ease of plotting
@@ -88,88 +88,91 @@ df_Transplant %>%
   #TODO rerun after all the data are added/verified
   ggplot() +
   geom_histogram(aes(x = `Eco-Reality`, 
-                     fill = Rodent.Recip), 
+                     fill = LabRodent.Recip), 
                  binwidth = 1) + 
   facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x") +
   #TODO: create shorter lables for the facet columns
   theme(legend.position = "top")
-#TODO: check where warning "Rodent.Donor is coming from?  
 
-## individual figures -------
+ggsave(paste(Sys.Date(),"Eco-realityComparisons.pdf"), 
+       width = 25, height = 10, units = "cm")
+# save the figure so everyone does not have to run the script
 
-# leave it here bc might need it in the future
-# for simplicity's sake, just collapse the code in RStudio
+## individual figures (>_<) -------
+
+## leave it here bc might need it in the future
+## for simplicity's sake, just collapse the code in RStudio
 
 ## Histogram Donor Microbiome
-df_Transplant %>% 
- ggplot () +
-  geom_histogram (aes(x = `Eco-Reality of Donor Microbiome (1-3)`, 
-                     fill = Rodent.Recip), 
-                 binwidth = 1) + 
-   facet_wrap (~ `Eco-Reality of Taxon Match`) 
-#==> NA panel is caused by the 6 new articles
-# TODO: rerun after all the data are added/verified
- 
-#Histogram Recipient Microbiome
-df_Transplant %>% 
-  ggplot () +
-  geom_histogram (aes(x = `Eco-Reality of Recipient Microbiome (1-5)`, 
-                      fill = Rodent.Recip), 
-                  binwidth = 1) + 
-  facet_wrap (~ `Eco-Reality of Taxon Match`) 
-
-#Histogram Donor Environment
-df_Transplant %>% 
-  ggplot () +
-  geom_histogram (aes(x = `Eco-Reality of Recipient Microbiome (1-5)`, 
-                      fill = Rodent.Recip), 
-                  binwidth = 1) + 
-  facet_wrap (~ `Eco-Reality of Taxon Match`)
-
- ggplot () +
-   geom_histogram (data = df_Transplant, 
-                   aes(x = Eco.Reality.Donor.Environment..1.5., 
-                       fill = Rodent.Recip), 
-                   binwidth = 1) + 
-   facet_wrap (~ Eco.Reality.of.Taxon.Match) 
- 
- #Histogram Recipient Environment
- ggplot () +
-   geom_histogram (data = df_Transplant, 
-                   aes(x = Eco.Reality.of.Recipient.Environment..1.5., 
-                       fill = Rodent.Recip), 
-                   binwidth = 1) + 
-   facet_wrap (~ Eco.Reality.of.Taxon.Match) 
- 
- #Histogram Donor Physiology
- ggplot () +
-   geom_histogram (data = df_Transplant, 
-                   aes(x = Eco.Reality.Donor.Physiology..1.2., 
-                       fill = Rodent.Recip), 
-                   binwidth = 1) + 
-   facet_wrap(~Eco.Reality.of.Taxon.Match)
- 
- #Histogram Recipient Physiology
- ggplot () +
-   geom_histogram (data = df_Transplant, 
-                   aes(x = Eco.Reality.of.Recipient.Physiology..1.2., 
-                  fill = Rodent.Recip), 
-                  binwidth = 1) + 
-   facet_wrap (~ Eco.Reality.of.Taxon.Match)
- 
- #Histogram Transplant Method
- ggplot () +
-   geom_histogram (data = df_Transplant, 
-                   aes(x = Eco.Reality.of.Transplant.Method..1.2., 
-                       fill = Rodent.Recip), 
-                   binwidth = 1) + 
-   facet_wrap (~ Eco.Reality.of.Taxon.Match)
- 
- #Histogram Housing Method
-  ggplot () +
-   geom_histogram (data = df_Transplant, 
-                   aes(x = Eco.Reality.of.Housing.Method..1.2., 
-                   fill = Rodent.Recip), 
-                   binwidth = 1) + 
-   facet_wrap (~ Eco.Reality.of.Taxon.Match) 
+# df_Transplant %>% 
+#  ggplot () +
+#   geom_histogram (aes(x = `Eco-Reality of Donor Microbiome (1-3)`, 
+#                      fill = Rodent.Recip), 
+#                  binwidth = 1) + 
+#    facet_wrap (~ `Eco-Reality of Taxon Match`) 
+# #==> NA panel is caused by the 6 new articles
+# # TODO: rerun after all the data are added/verified
+#  
+# #Histogram Recipient Microbiome
+# df_Transplant %>% 
+#   ggplot () +
+#   geom_histogram (aes(x = `Eco-Reality of Recipient Microbiome (1-5)`, 
+#                       fill = Rodent.Recip), 
+#                   binwidth = 1) + 
+#   facet_wrap (~ `Eco-Reality of Taxon Match`) 
+# 
+# #Histogram Donor Environment
+# df_Transplant %>% 
+#   ggplot () +
+#   geom_histogram (aes(x = `Eco-Reality of Recipient Microbiome (1-5)`, 
+#                       fill = Rodent.Recip), 
+#                   binwidth = 1) + 
+#   facet_wrap (~ `Eco-Reality of Taxon Match`)
+# 
+#  ggplot () +
+#    geom_histogram (data = df_Transplant, 
+#                    aes(x = Eco.Reality.Donor.Environment..1.5., 
+#                        fill = Rodent.Recip), 
+#                    binwidth = 1) + 
+#    facet_wrap (~ Eco.Reality.of.Taxon.Match) 
+#  
+#  #Histogram Recipient Environment
+#  ggplot () +
+#    geom_histogram (data = df_Transplant, 
+#                    aes(x = Eco.Reality.of.Recipient.Environment..1.5., 
+#                        fill = Rodent.Recip), 
+#                    binwidth = 1) + 
+#    facet_wrap (~ Eco.Reality.of.Taxon.Match) 
+#  
+#  #Histogram Donor Physiology
+#  ggplot () +
+#    geom_histogram (data = df_Transplant, 
+#                    aes(x = Eco.Reality.Donor.Physiology..1.2., 
+#                        fill = Rodent.Recip), 
+#                    binwidth = 1) + 
+#    facet_wrap(~Eco.Reality.of.Taxon.Match)
+#  
+#  #Histogram Recipient Physiology
+#  ggplot () +
+#    geom_histogram (data = df_Transplant, 
+#                    aes(x = Eco.Reality.of.Recipient.Physiology..1.2., 
+#                   fill = Rodent.Recip), 
+#                   binwidth = 1) + 
+#    facet_wrap (~ Eco.Reality.of.Taxon.Match)
+#  
+#  #Histogram Transplant Method
+#  ggplot () +
+#    geom_histogram (data = df_Transplant, 
+#                    aes(x = Eco.Reality.of.Transplant.Method..1.2., 
+#                        fill = Rodent.Recip), 
+#                    binwidth = 1) + 
+#    facet_wrap (~ Eco.Reality.of.Taxon.Match)
+#  
+#  #Histogram Housing Method
+#   ggplot () +
+#    geom_histogram (data = df_Transplant, 
+#                    aes(x = Eco.Reality.of.Housing.Method..1.2., 
+#                    fill = Rodent.Recip), 
+#                    binwidth = 1) + 
+#    facet_wrap (~ Eco.Reality.of.Taxon.Match) 
  
