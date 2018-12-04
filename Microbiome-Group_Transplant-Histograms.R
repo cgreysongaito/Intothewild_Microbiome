@@ -7,11 +7,30 @@
 ##
 ##############################
 
- library(tidyverse)
+theme_simple <- function () { 
+  theme_grey() %+replace% 
+    theme(
+      axis.line=element_line(colour="black"),
+      panel.grid.minor=element_blank(), 
+      panel.grid.major=element_blank(),
+      panel.background=element_blank(), 
+      axis.title=element_text(size=28,face="bold"),
+      axis.text.x=element_text(size=24, colour="Black"),
+      axis.text.y=element_text(size=24, colour="Black"),
+      axis.ticks.length=unit(0.5,"cm"),
+      axis.ticks=element_line(size=0.5, colour="Black"),
+      panel.border=element_rect(fill=FALSE,size=0.5),
+      legend.title=element_text(size=15),
+      legend.key=element_blank()
+    )
+  
+}
+
+library("tidyverse"); theme_set(theme_simple())
 library(viridis)
 library(googlesheets)
 # + scale_color/fill_viridis(discrete = T/F)
-theme_set(theme_light())
+#theme_set(theme_light())
 
 # Startup ends here
 
@@ -46,11 +65,14 @@ recipients = df_Transplant %>%
 
 recipients # check which are rodents
 
-recipients = tibble(`Recipient Taxon` = recipients, LabRodent.Recip = "Other")
-recipients[c(14:16,19:20), 2] = "LabRodent"
+labrodents <- c("Mice", "mice", "mouse", "rat", "rats" )
+
+recipients = tibble(`Recipient Taxon` = recipients) %>%
+  mutate(LabRodent.Recip = ifelse(`Recipient Taxon` %in% labrodents, "LabRodent","Other"))
+
 recipients %>% View()
 #TODO: after new import, check the above line if new recipient were added
-#TODO: if necessary, adjust numbers accordingly
+#TODO: if necessary, adjust labrodent vector
 
 ## create new column with lookup table and left_join
 df_Transplant = left_join(df_Transplant, recipients, by = "Recipient Taxon")
@@ -80,8 +102,13 @@ df_Transplant %>%
 df_Transplant %>% 
   dplyr::select(LabRodent.Recip, starts_with("Eco-Reality")) %>% 
   # select the relevant columns for the plotting function
-  gather(starts_with("Eco-reality of"), key = "Type", value = "Eco-Reality") %>% 
-  # create the long format for ease of plotting
+  gather(starts_with("Eco-Reality of"), key = "Type", value = "Eco-Reality") %>% 
+  mutate(Type=str_remove(Type, "Eco-Reality of ")) %>%
+  mutate(Type=str_remove(Type, " \\(1-3\\)")) %>%
+  mutate(Type=str_remove(Type, " \\(1-5\\)")) %>%
+  mutate(Type=str_remove(Type, " \\(1-2\\)")) %>%
+  mutate(Type=str_replace(Type, " ", "\n"))%>%
+# create the long format for ease of plotting
   # not necessary to create individual figures (see code below)
   mutate(`Eco-Reality` = as.numeric(`Eco-Reality`)) %>% 
   # this is probably only needed bc of the NAs from the new articles
@@ -92,7 +119,10 @@ df_Transplant %>%
                  binwidth = 1) + 
   facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x") +
   #TODO: create shorter lables for the facet columns
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  scale_fill_viridis(name="Recipient Taxon Type", breaks=c("LabRodent","Other"),labels=c("Lab Rodent", "Other"), alpha = 1, begin = 0, end = 1, direction = 1, discrete = TRUE, option = "D")+
+  #scale_fill_manual(name = "Recipient Taxon Type", values = c("LabRodent","Other")) +
+  ylab("Count")
 
 ggsave(paste(Sys.Date(),"Eco-realityComparisons.pdf"), 
        width = 25, height = 10, units = "cm")
