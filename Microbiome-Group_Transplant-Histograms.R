@@ -118,7 +118,9 @@ df_Transplant %>%
   geom_bar(aes(x = `Eco-Reality`, 
                      fill = LabRodent.Recip)) + 
   facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x",space = "free_x") +
-  theme(legend.position = "top") +
+  theme(legend.position = "top",
+        strip.background=element_blank(),strip.text.x=element_text(size=14),strip.text.y=element_text(size=14),
+        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
   scale_fill_viridis(
     name = "Recipient Taxon Type", breaks = c("LabRodent", "Other"),
     labels = c("Lab Rodent", "Other"), alpha = 1, begin = 0, end = 1,
