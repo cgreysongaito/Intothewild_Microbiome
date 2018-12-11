@@ -110,14 +110,15 @@ df_Transplant %>%
   mutate(Type=str_replace(Type, " ", "\n"))%>%
 # create the long format for ease of plotting
   # not necessary to create individual figures (see code below)
-  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`)) %>% 
+  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
+         
+         Type = factor(Type,levels=c("Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
   # this is probably only needed bc of the NAs from the new articles
   #TODO rerun after all the data are added/verified
   ggplot() +
-  geom_histogram(aes(x = `Eco-Reality`, 
-                     fill = LabRodent.Recip), 
-                 binwidth = 1) + 
-  facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x") +
+  geom_bar(aes(x = `Eco-Reality`, 
+                     fill = LabRodent.Recip)) + 
+  facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x",space = "free_x") +
   #TODO: create shorter lables for the facet columns
   theme(legend.position = "top") +
   scale_fill_viridis(name="Recipient Taxon Type", breaks=c("LabRodent","Other"),labels=c("Lab Rodent", "Other"), alpha = 1, begin = 0, end = 1, direction = 1, discrete = TRUE, option = "D")+
