@@ -15,9 +15,9 @@ theme_simple <- function() {
       panel.grid.major = element_blank(),
       panel.background = element_blank(),
       axis.title = element_text(size = 28, face = "bold"),
-      axis.text.x = element_text(size = 24, colour = "Black"),
-      axis.text.y = element_text(size = 24, colour = "Black"),
-      axis.ticks.length = unit(0.5, "cm"),
+      axis.text.x = element_text(size = 15, colour = "Black"),
+      axis.text.y = element_text(size = 15, colour = "Black"),
+      axis.ticks.length = unit(0.25, "cm"),
       axis.ticks = element_line(size = 0.5, colour = "Black"),
       panel.border = element_rect(fill = FALSE, size = 0.5),
       legend.title = element_text(size = 15),
@@ -119,19 +119,19 @@ df_Transplant %>%
                      fill = LabRodent.Recip)) + 
   facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x",space = "free_x") +
   theme(legend.position = "top",
-        strip.background=element_blank(),strip.text.x=element_text(size=14),strip.text.y=element_text(size=14),
+        strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
         axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
   scale_fill_viridis(
     name = "Recipient Taxon Type", breaks = c("LabRodent", "Other"),
-    labels = c("Lab Rodent", "Other"), alpha = 1, begin = 0, end = 1,
+    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
     direction = 1, discrete = TRUE, option = "D"
   ) +
   scale_x_continuous(breaks = function(x) pretty(x)[pretty(x) %% 1 == 0]) +
   # https://stackoverflow.com/questions/15622001/how-to-display-only-integer-values-on-an-axis-using-ggplot2
-  ylab("Count")
+  xlab("Eco-Reality")+ylab("Count")
 
 ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
-  width = 25, height = 10, units = "cm"
+  width = 25, height = 12, units = "cm"
 )
 # save the figure so everyone does not have to run the script
 
