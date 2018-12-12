@@ -152,7 +152,32 @@ ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
 
 #Figure of cumulative number of species over time
 df_Transplant %>%
-  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip)
+  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
+  mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
+  group_by(Year) %>%
+  summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
+  mutate(DonorLabRodentcs = cumsum(DonorLabRodent), DonorOthercs = cumsum(DonorOther) , RecipLabRodentcs = cumsum(RecipLabRodent), RecipOthercs = cumsum (RecipOther) ) %>%
+ select(-c(DonorLabRodent,DonorOther,RecipLabRodent,RecipOther))%>%
+  gather(Type, CumulativeSum, -Year) %>%
+  mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
+  mutate(Type = str_remove(Type, "Donor")) %>%
+  mutate(Type = str_remove(Type, "Recip")) %>%
+  mutate(Type = str_remove(Type, "cs")) %>%
+ggplot()+
+  geom_col(aes(x = Year, y = CumulativeSum,fill = Type )) +
+  facet_grid(.~DonorRecip)+
+  theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
+        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
+  scale_fill_viridis(
+    name = "Taxon Type", breaks = c("LabRodent", "Other"),
+    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
+    direction = 1, discrete = TRUE, option = "D"
+  ) +
+  ylab("Cumulative Sum")
+
+ggsave(paste(Sys.Date(), "CumulativeSum.pdf"),
+       width = 18, height = 12, units = "cm"
+)
 
 ## individual figures (>_<) -------
 
