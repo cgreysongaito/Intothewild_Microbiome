@@ -57,6 +57,20 @@ summary(df_Transplant)
 
 ## create lookup table more programmatically
 
+labrodents <- c("Mice", "mice", "mouse", "rat", "rats")
+
+
+donors <- df_Transplant %>%
+  dplyr::select(`Donor Taxon`) %>%
+  unique() %>%
+  arrange(`Donor Taxon`) %>%
+  pull()
+
+donors
+
+donors <- tibble(`Donor Taxon` = donors) %>%
+  mutate(LabRodent.Donor = ifelse(`Donor Taxon` %in% labrodents, "LabRodent", "Other"))
+
 recipients <- df_Transplant %>%
   dplyr::select(`Recipient Taxon`) %>%
   unique() %>%
@@ -65,7 +79,7 @@ recipients <- df_Transplant %>%
 
 recipients # check which are rodents
 
-labrodents <- c("Mice", "mice", "mouse", "rat", "rats")
+
 
 recipients <- tibble(`Recipient Taxon` = recipients) %>%
   mutate(LabRodent.Recip = ifelse(`Recipient Taxon` %in% labrodents, "LabRodent", "Other"))
@@ -75,10 +89,11 @@ recipients %>% View()
 # TODO: if necessary, adjust labrodent vector
 
 ## create new column with lookup table and left_join
-df_Transplant <- left_join(df_Transplant, recipients, by = "Recipient Taxon")
+df_Transplant <- left_join(df_Transplant, recipients, by = "Recipient Taxon") %>%
+  left_join(donors, by = "Donor Taxon")
 
 df_Transplant %>%
-  dplyr::select(`Recipient Taxon`, LabRodent.Recip) %>%
+  dplyr::select(`Donor Taxon`, LabRodent.Donor,`Recipient Taxon`, LabRodent.Recip) %>%
   View()
 # check if conversion was done correctly
 # easiest to do by sorting the Rodent column in the viewer
@@ -134,6 +149,10 @@ ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
   width = 25, height = 12, units = "cm"
 )
 # save the figure so everyone does not have to run the script
+
+#Figure of cumulative number of species over time
+df_Transplant %>%
+  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip)
 
 ## individual figures (>_<) -------
 
