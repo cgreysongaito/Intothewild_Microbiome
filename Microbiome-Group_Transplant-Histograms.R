@@ -150,6 +150,50 @@ ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
 )
 # save the figure so everyone does not have to run the script
 
+
+#Figure of average ecoreality over time
+df_Transplant %>%
+  dplyr::select(Year, starts_with("Eco-Reality")) %>%
+  # select the relevant columns for the plotting function
+  gather(starts_with("Eco-Reality of"), key = "Type", value = "Eco-Reality") %>%
+  mutate(Type = str_remove(Type, "Eco-Reality of ")) %>%
+  mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
+  mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
+  mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
+  mutate(Type = str_replace(Type, " ", "\n")) %>%
+  # create the long format for ease of plotting
+  # not necessary to create individual figures (see code below)
+  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
+         Type = factor(Type,levels=c("Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
+  group_by(Year, `Eco-Reality Taxon Match`, Type) %>%
+  summarise(MeanEcoReality = mean(`Eco-Reality`)) %>%
+  ggplot() +
+  geom_point(aes(x = Year, y = MeanEcoReality)) +
+  facet_grid(Type~`Eco-Reality Taxon Match`, scales = "free_y") +
+  theme(legend.position = "top",
+        strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
+        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
+scale_y_continuous(breaks = function(x) pretty(x)[pretty(x) %% 1 == 0]) +
+  ylab("Eco-Reality")
+
+ggsave(paste(Sys.Date(), "Eco-realityOverTime.pdf"),
+       width = 12, height = 25, units = "cm"
+)
+
+#Figure of number of articles over time
+
+df_Transplant %>%
+  select(PdFName,Year) %>%
+  group_by(Year) %>% 
+  summarise(Count = length(unique(PdFName))) %>%
+  ggplot() +
+  geom_line(aes(x = Year, y = cumsum(Count))) +
+  ylab("cumulative sum of articles")
+
+ggsave(paste(Sys.Date(), "CumulativeSumArticles.pdf"),
+       width = 18, height = 14, units = "cm"
+)
+
 #Figure of cumulative number of species over time
 df_Transplant %>%
   select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
