@@ -59,7 +59,6 @@ summary(df_Transplant)
 
 labrodents <- c("Mice", "mice", "mouse", "rat", "rats")
 
-
 donors <- df_Transplant %>%
   dplyr::select(`Donor Taxon`) %>%
   unique() %>%
@@ -240,10 +239,32 @@ ggplot()+
   ) +
   ylab("Cumulative Sum")
 
-ggsave(paste(Sys.Date(), "CumulativeSum.pdf"),
+ggsave(paste(Sys.Date(), "CumulativeSumAnimals.pdf"),
        width = 18, height = 12, units = "cm"
 )
 
+
+# Identification of most eco-real articles and least eco-real articles
+df_Transplant %>%
+  dplyr::select(PdFName, `Transplant Interaction`, starts_with("Eco-Reality")) %>%
+  mutate(`Eco-Reality Taxon Match` = ifelse(`Eco-Reality Taxon Match` == "Match",2,1))%>%
+  # select the relevant columns for the plotting function
+  gather(starts_with("Eco-Reality"), key = "Type", value = "Eco-Reality") %>%
+  mutate(Type = str_remove(Type, "Eco-Reality")) %>%
+    mutate(Type = str_remove(Type, " of ")) %>%
+  mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
+  mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
+  mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
+  # create the long format for ease of plotting
+  # not necessary to create individual figures (see code below)
+  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`)) %>%
+  spread(Type, `Eco-Reality`) %>%
+  mutate(EcoRealSum = rowSums(.[3:11])) %>%
+  group_by(PdFName) %>%
+  summarise(EcoRealArtMax = max(EcoRealSum), EcoRealArtMin = min(EcoRealSum)) %>%
+  arrange(EcoRealArtMax)
+  
+  
 ## individual figures (>_<) -------
 
 ## leave it here bc might need it in the future
