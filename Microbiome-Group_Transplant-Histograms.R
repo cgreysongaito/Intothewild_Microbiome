@@ -104,6 +104,12 @@ length(unique(df_Transplant$PdFName)) #55 articles
 #Calculation of number of transplant conditions
 length(df_Transplant$PdFName) #131 transplant conditions (rows)
 
+#calculation of average number of transplant conditions per article
+summary(df_Transplant %>%
+  group_by(PdFName) %>%
+  summarise(TransplantCount = length(`Transplant Interaction`)) %>%
+ select(TransplantCount)) # mean 2.382
+
 ## create new rodent/other column individually # (>_<) ------
 #
 # df_Transplant$Rodent.Recip <- df_Transplant$`Recipient Taxon` #Create a new column identical to recipient taxon column
