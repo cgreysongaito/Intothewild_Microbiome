@@ -98,17 +98,22 @@ df_Transplant %>%
 # check if conversion was done correctly
 # easiest to do by sorting the Rodent column in the viewer
 
-#Calculation of number of papers (assuming PdFName are unique for each article)
+# Calculation of number of papers (assuming PdFName are unique for each article)
 length(unique(df_Transplant$PdFName)) #55 articles
 
-#Calculation of number of transplant conditions
+# Calculation of number of transplant conditions
 length(df_Transplant$PdFName) #131 transplant conditions (rows)
 
-#calculation of average number of transplant conditions per article
+# Calculation of average number of transplant conditions per article
 summary(df_Transplant %>%
   group_by(PdFName) %>%
   summarise(TransplantCount = length(`Transplant Interaction`)) %>%
  select(TransplantCount)) # mean 2.382
+
+# Calculation of number of match and mismatch transplant conditions
+df_Transplant %>%
+  group_by(`Eco-Reality Taxon Match`) %>%
+  summarise(MatchCount = length(`Number of Treatment Groups`))
 
 ## create new rodent/other column individually # (>_<) ------
 #
