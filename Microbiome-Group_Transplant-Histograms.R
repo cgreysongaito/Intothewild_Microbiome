@@ -98,6 +98,12 @@ df_Transplant %>%
 # check if conversion was done correctly
 # easiest to do by sorting the Rodent column in the viewer
 
+#Calculation of number of papers (assuming PdFName are unique for each article)
+length(unique(df_Transplant$PdFName)) #55 articles
+
+#Calculation of number of transplant conditions
+length(df_Transplant$PdFName) #131 transplant conditions (rows)
+
 ## create new rodent/other column individually # (>_<) ------
 #
 # df_Transplant$Rodent.Recip <- df_Transplant$`Recipient Taxon` #Create a new column identical to recipient taxon column
