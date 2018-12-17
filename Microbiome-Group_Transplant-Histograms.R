@@ -110,9 +110,13 @@ summary(df_Transplant %>%
   summarise(TransplantCount = length(`Transplant Interaction`)) %>%
  select(TransplantCount)) # mean 2.382
 
-# Calculation of number of match and mismatch transplant conditions
+# Calculation of number of match and mismatch transplant conditions and number of lab rodents and other
 df_Transplant %>%
-  group_by(`Eco-Reality Taxon Match`) %>%
+  group_by(`Eco-Reality Taxon Match`, ) %>%
+  summarise(MatchCount = length(`Number of Treatment Groups`))
+
+df_Transplant %>%
+  group_by(`Eco-Reality Taxon Match`, LabRodent.Donor, LabRodent.Recip) %>%
   summarise(MatchCount = length(`Number of Treatment Groups`))
 
 ## create new rodent/other column individually # (>_<) ------
