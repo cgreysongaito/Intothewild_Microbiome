@@ -101,17 +101,17 @@ df_Transplant %>%
 length(unique(df_Transplant$PdFName)) #55 articles
 
 # Calculation of number of transplant conditions
-length(df_Transplant$PdFName) #131 transplant conditions (rows)
+length(df_Transplant$PdFName) #150 transplant conditions (rows)
 
 # Calculation of average number of transplant conditions per article
 summary(df_Transplant %>%
   group_by(PdFName) %>%
   summarise(TransplantCount = length(`Transplant Interaction`)) %>%
- select(TransplantCount)) # mean 2.382
+ select(TransplantCount)) # mean 2.727
 
 # Calculation of number of match and mismatch transplant conditions and number of lab rodents and other
 df_Transplant %>%
-  group_by(`Eco-Reality Taxon Match`, ) %>%
+  group_by(`Eco-Reality Taxon Match`) %>%
   summarise(MatchCount = length(`Number of Treatment Groups`))
 
 df_Transplant %>%
@@ -262,7 +262,8 @@ df_Transplant %>%
   mutate(EcoRealSum = rowSums(.[3:11])) %>%
   group_by(PdFName) %>%
   summarise(EcoRealArtMax = max(EcoRealSum), EcoRealArtMin = min(EcoRealSum)) %>%
-  arrange(EcoRealArtMax)
+  arrange(EcoRealArtMax) %>%
+  View()
   
   
 ## individual figures (>_<) -------
