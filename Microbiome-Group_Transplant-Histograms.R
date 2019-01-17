@@ -118,20 +118,6 @@ df_Transplant %>%
   group_by(`Eco-Reality Taxon Match`, LabRodent.Donor, LabRodent.Recip) %>%
   summarise(MatchCount = length(`Number of Treatment Groups`))
 
-## create new rodent/other column individually # (>_<) ------
-#
-# df_Transplant$Rodent.Recip <- df_Transplant$`Recipient Taxon` #Create a new column identical to recipient taxon column
-# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'mouse'] <- 'Rodent' #Replace various lab rodent models with 'Rodent'
-# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'Mice'] <- 'Rodent'
-# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'rat'] <- 'Rodent'
-# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip == 'rats'] <- 'Rodent'
-# df_Transplant$Rodent.Recip[df_Transplant$Rodent.Recip != 'Rodent'] <- 'Other' #Replace all non-lab-rodent taxons to 'other'
-#
-# df_Transplant$Rodent.Donor <- df_Transplant$`Donor Taxon` #Create a new column identical to donor taxon column
-# df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor == 'mouse'] <- 'Rodent' #Replace various lab rodent models with 'Rodent'
-# df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor == 'rat'] <- 'Rodent'
-# df_Transplant$Rodent.Donor[df_Transplant$Rodent.Donor != 'Rodent'] <- 'Other' #Replace all non-lab-rodent taxons to 'other'
-
 ## Summary figures --------
 
 df_Transplant %>%
@@ -186,14 +172,20 @@ df_Transplant %>%
   mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
          Type = factor(Type,levels=c("Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
   group_by(Year, `Eco-Reality Taxon Match`, Type) %>%
-  summarise(MeanEcoReality = mean(`Eco-Reality`)) %>%
+  summarise(MeanEcoReality = mean(`Eco-Reality`), numTrans = length(`Eco-Reality`)) %>%
   ggplot() +
-  geom_point(aes(x = Year, y = MeanEcoReality)) +
-  facet_grid(Type~`Eco-Reality Taxon Match`, scales = "free_y") +
+  geom_point(aes(x = Year, y = MeanEcoReality, size=numTrans, colour=`Eco-Reality Taxon Match`)) +
+  facet_grid(Type~., scales = "free_y") +
   theme(legend.position = "top",
         strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
         axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
 scale_y_continuous(breaks = function(x) pretty(x)[pretty(x) %% 1 == 0]) +
+  scale_colour_viridis(
+    name = "Taxon Match", breaks = c("Match", "Mismatch"),
+    labels = c("Match", "Mismatch"), alpha = 1, begin = 0, end = 0.5,
+    direction = 1, discrete = TRUE, option = "plasma"
+  )+
+  scale_size(name = "Number of Transplant Conditions")+
   ylab("Eco-Reality")
 
 ggsave(paste(Sys.Date(), "Eco-realityOverTime.pdf"),
