@@ -158,7 +158,7 @@ df_Transplant %>%
   ) +
   ylab("Proportion")
 
-ggsave(paste(Sys.Date(), "CumulativeSumAnimals.pdf"),
+ggsave(paste(Sys.Date(), "ProportionAnimals.pdf"),
        width = 18, height = 12, units = "cm"
 )
 
