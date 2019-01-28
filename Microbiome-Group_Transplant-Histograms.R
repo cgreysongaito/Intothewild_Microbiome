@@ -120,9 +120,54 @@ df_Transplant %>%
 
 ## Summary figures --------
 
+#Figure 1 - Are microbiome studies increasing over time?
+
+df_Transplant %>%
+  select(PdFName,Year) %>%
+  group_by(Year) %>% 
+  summarise(Count = length(unique(PdFName))) %>%
+  ggplot() +
+  geom_line(aes(x = Year, y = cumsum(Count))) +
+  ylab("cumulative sum of articles")
+
+ggsave(paste(Sys.Date(), "CumulativeSumArticles.pdf"),
+       width = 18, height = 14, units = "cm"
+)
+
+#Figure 2 - How much is ecological microbiome now differentiating from medical microbiome literature (our study and other inspired by medical literature - is present literature still biased by medical literature?)
+df_Transplant %>%
+  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
+  mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
+  group_by(Year) %>%
+  summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
+  mutate(Total = DonorLabRodent+DonorOther, PDonorLabRodent=DonorLabRodent/Total, PDonorOther=DonorOther/Total, PRecipLabRodent=RecipLabRodent/Total,PRecipOther=RecipOther/Total) %>%
+  select(Year,PDonorLabRodent,PDonorOther,PRecipLabRodent,PRecipOther) %>%
+  gather(Type, Prop, -Year) %>%
+  mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
+  mutate(Type = str_remove(Type, "PDonor")) %>%
+  mutate(Type = str_remove(Type, "PRecip")) %>%
+  ggplot()+
+  geom_col(aes(x = Year, y = Prop, fill = Type )) +
+  facet_grid(.~DonorRecip)+
+  theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
+        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
+  scale_fill_viridis(
+    name = "Taxon Type", breaks = c("LabRodent", "Other"),
+    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
+    direction = 1, discrete = TRUE, option = "D"
+  ) +
+  ylab("Proportion")
+
+ggsave(paste(Sys.Date(), "CumulativeSumAnimals.pdf"),
+       width = 18, height = 12, units = "cm"
+)
+
+## Figure 3 - What status of eco-reality in present literature?
 df_Transplant %>%
   dplyr::select(LabRodent.Recip, starts_with("Eco-Reality")) %>%
   # select the relevant columns for the plotting function
+  mutate(`Eco-Reality of Taxon Match` = ifelse(`Eco-Reality Taxon Match`=="Match",2,1)) %>%
+  select(-`Eco-Reality Taxon Match`) %>%
   gather(starts_with("Eco-Reality of"), key = "Type", value = "Eco-Reality") %>%
   mutate(Type = str_remove(Type, "Eco-Reality of ")) %>%
   mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
@@ -132,13 +177,13 @@ df_Transplant %>%
   # create the long format for ease of plotting
   # not necessary to create individual figures (see code below)
   mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
-         Type = factor(Type,levels=c("Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
+         Type = factor(Type,levels=c("Taxon\nMatch","Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
   # this is needed bc of the NAs and NS from the new articles
   # TODO rerun after all the data are added/verified
   ggplot() +
   geom_bar(aes(x = `Eco-Reality`, 
                      fill = LabRodent.Recip)) + 
-  facet_grid (`Eco-Reality Taxon Match` ~ Type, scales = "free_x",space = "free_x") +
+  facet_grid (.~ Type, scales = "free_x",space = "free_x") +
   theme(legend.position = "top",
         strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
         axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
@@ -157,10 +202,12 @@ ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
 # save the figure so everyone does not have to run the script
 
 
-#Figure of average ecoreality over time
+#Figure 4 - Is there improvement of eco-reality over time?
 df_Transplant %>%
   dplyr::select(Year, starts_with("Eco-Reality")) %>%
   # select the relevant columns for the plotting function
+  mutate(`Eco-Reality of Taxon Match` = ifelse(`Eco-Reality Taxon Match`=="Match",2,1)) %>%
+  select(-`Eco-Reality Taxon Match`) %>%
   gather(starts_with("Eco-Reality of"), key = "Type", value = "Eco-Reality") %>%
   mutate(Type = str_remove(Type, "Eco-Reality of ")) %>%
   mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
@@ -170,70 +217,28 @@ df_Transplant %>%
   # create the long format for ease of plotting
   # not necessary to create individual figures (see code below)
   mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
-         Type = factor(Type,levels=c("Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
-  group_by(Year, `Eco-Reality Taxon Match`, Type) %>%
-  summarise(MeanEcoReality = mean(`Eco-Reality`), numTrans = length(`Eco-Reality`)) %>%
+         Type = factor(Type,levels=c("Taxon\nMatch","Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
   ggplot() +
-  geom_point(aes(x = Year, y = MeanEcoReality, size=numTrans, colour=`Eco-Reality Taxon Match`)) +
+  geom_jitter(aes(x = Year, y = `Eco-Reality`),width=0.25,height=0) +
+  geom_smooth(aes(x = Year, y = `Eco-Reality`), method=lm, se=FALSE)+
   facet_grid(Type~., scales = "free_y") +
   theme(legend.position = "top",
         strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
         axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
 scale_y_continuous(breaks = function(x) pretty(x)[pretty(x) %% 1 == 0]) +
-  scale_colour_viridis(
-    name = "Taxon Match", breaks = c("Match", "Mismatch"),
-    labels = c("Match", "Mismatch"), alpha = 1, begin = 0, end = 0.5,
-    direction = 1, discrete = TRUE, option = "plasma"
-  )+
-  scale_size(name = "Number of Transplant Conditions")+
+  # scale_colour_viridis(
+  #   name = "Taxon Match", breaks = c("Match", "Mismatch"),
+  #   labels = c("Match", "Mismatch"), alpha = 1, begin = 0, end = 0.5,
+  #   direction = 1, discrete = TRUE, option = "plasma"
+  # )+
+  # scale_size(name = "Number of Transplant Conditions")+
   ylab("Eco-Reality")
 
 ggsave(paste(Sys.Date(), "Eco-realityOverTime.pdf"),
        width = 12, height = 25, units = "cm"
 )
 
-#Figure of number of articles over time
 
-df_Transplant %>%
-  select(PdFName,Year) %>%
-  group_by(Year) %>% 
-  summarise(Count = length(unique(PdFName))) %>%
-  ggplot() +
-  geom_line(aes(x = Year, y = cumsum(Count))) +
-  ylab("cumulative sum of articles")
-
-ggsave(paste(Sys.Date(), "CumulativeSumArticles.pdf"),
-       width = 18, height = 14, units = "cm"
-)
-
-#Figure of cumulative number of species over time
-df_Transplant %>%
-  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
-  mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
-  group_by(Year) %>%
-  summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
-  mutate(DonorLabRodentcs = cumsum(DonorLabRodent), DonorOthercs = cumsum(DonorOther) , RecipLabRodentcs = cumsum(RecipLabRodent), RecipOthercs = cumsum (RecipOther) ) %>%
- select(-c(DonorLabRodent,DonorOther,RecipLabRodent,RecipOther))%>%
-  gather(Type, CumulativeSum, -Year) %>%
-  mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
-  mutate(Type = str_remove(Type, "Donor")) %>%
-  mutate(Type = str_remove(Type, "Recip")) %>%
-  mutate(Type = str_remove(Type, "cs")) %>%
-ggplot()+
-  geom_col(aes(x = Year, y = CumulativeSum,fill = Type )) +
-  facet_grid(.~DonorRecip)+
-  theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
-        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
-  scale_fill_viridis(
-    name = "Taxon Type", breaks = c("LabRodent", "Other"),
-    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
-    direction = 1, discrete = TRUE, option = "D"
-  ) +
-  ylab("Cumulative Sum")
-
-ggsave(paste(Sys.Date(), "CumulativeSumAnimals.pdf"),
-       width = 18, height = 12, units = "cm"
-)
 
 
 # Identification of most eco-real articles and least eco-real articles
