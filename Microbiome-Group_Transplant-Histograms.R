@@ -140,14 +140,13 @@ df_Transplant %>%
   mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
   group_by(Year) %>%
   summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
-  mutate(Total = DonorLabRodent+DonorOther, PDonorLabRodent=DonorLabRodent/Total, PDonorOther=DonorOther/Total, PRecipLabRodent=RecipLabRodent/Total,PRecipOther=RecipOther/Total) %>%
-  select(Year,PDonorLabRodent,PDonorOther,PRecipLabRodent,PRecipOther) %>%
-  gather(Type, Prop, -Year) %>%
+  select(Year,DonorLabRodent,DonorOther,RecipLabRodent,RecipOther) %>%
+  gather(Type, Total, -Year) %>%
   mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
-  mutate(Type = str_remove(Type, "PDonor")) %>%
-  mutate(Type = str_remove(Type, "PRecip")) %>%
+  mutate(Type = str_remove(Type, "Donor")) %>%
+  mutate(Type = str_remove(Type, "Recip")) %>%
   ggplot()+
-  geom_col(aes(x = Year, y = Prop, fill = Type )) +
+  geom_col(aes(x = Year, y = Total, fill = Type )) +
   facet_grid(.~DonorRecip)+
   theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
         axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
@@ -156,9 +155,9 @@ df_Transplant %>%
     labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
     direction = 1, discrete = TRUE, option = "D"
   ) +
-  ylab("Proportion")
+  ylab("Count")
 
-ggsave(paste(Sys.Date(), "ProportionAnimals.pdf"),
+ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
        width = 18, height = 12, units = "cm"
 )
 
@@ -239,7 +238,53 @@ ggsave(paste(Sys.Date(), "Eco-realityOverTime.pdf"),
 )
 
 
+#Attempt at standardisation of eco-reality
+df_Transplant %>%
+  dplyr::select(Year, PdFName, starts_with("Eco-Reality")) %>%
+  # select the relevant columns for the plotting function
+  mutate(`Eco-Reality of Taxon Match` = ifelse(`Eco-Reality Taxon Match`=="Match",2,1), PdFName= as.factor(PdFName)) %>%
+  select(-`Eco-Reality Taxon Match`) %>%
+  mutate(`Eco-Reality of Donor Environment (1-5)`=as.integer(`Eco-Reality of Donor Environment (1-5)`), `Eco-Reality of Donor Physiology (1-2)`=as.integer(`Eco-Reality of Donor Physiology (1-2)`),`Eco-Reality of Housing Method (1-2)`=as.integer(`Eco-Reality of Housing Method (1-2)`)) %>%
+  mutate(zTM=scale(`Eco-Reality of Transplanted Microbiome (1-3)`, center = TRUE, scale = TRUE),zDE=scale(`Eco-Reality of Donor Environment (1-5)`, center = TRUE, scale = TRUE),zDP=scale(`Eco-Reality of Donor Physiology (1-2)`, center = TRUE, scale = TRUE),zRM=scale(`Eco-Reality of Recipient Microbiome (1-3)`, center = TRUE, scale = TRUE),zRE=scale(`Eco-Reality of Recipient Environment (1-5)`, center = TRUE, scale = TRUE),zRP=scale(`Eco-Reality of Recipient Physiology (1-2)`, center = TRUE, scale = TRUE),zTMe=scale(`Eco-Reality of Transplant Method (1-2)`, center = TRUE, scale = TRUE),zHM=scale(`Eco-Reality of Housing Method (1-2)`, center = TRUE, scale = TRUE),zTaM=scale(`Eco-Reality of Taxon Match`, center = TRUE, scale = TRUE))%>%
+  mutate(sumER = as.numeric(zTM+zDE+zDP+zRM+zRE+zRP+zTMe+zHM+zTaM)) %>%
+  ungroup %>%
+  select(Year,PdFName,sumER)%>%
+  group_by(Year,PdFName) %>%
+  summarise(AvER = mean(sumER, na.rm=TRUE)) %>%
+  ggplot()+
+  geom_point(aes(Year, AvER))+
+  ylab("Average Standardized Eco-Reality")
 
+ggsave(paste(Sys.Date(), "Eco-realityStandardOverTime.pdf"),
+       width = 12, height = 25, units = "cm"
+)
+
+#attempt at eco-reality over time summed and averaged for each paper
+
+df_Transplant %>%
+  dplyr::select(Year,PdFName, `Transplant Interaction`, starts_with("Eco-Reality")) %>%
+  mutate(`Eco-Reality Taxon Match` = ifelse(`Eco-Reality Taxon Match` == "Match",2,1))%>%
+  # select the relevant columns for the plotting function
+  gather(starts_with("Eco-Reality"), key = "Type", value = "Eco-Reality") %>%
+  mutate(Type = str_remove(Type, "Eco-Reality")) %>%
+  mutate(Type = str_remove(Type, " of ")) %>%
+  mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
+  mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
+  mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
+  # create the long format for ease of plotting
+  # not necessary to create individual figures (see code below)
+  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`)) %>%
+  spread(Type, `Eco-Reality`) %>%
+  mutate(EcoRealSum = rowSums(.[3:11])) %>%
+  group_by(Year,PdFName) %>%
+  summarise(AvER = mean(EcoRealSum, na.rm=TRUE)) %>%
+  ggplot()+
+  geom_point(aes(Year, AvER))+
+  ylab("Average Eco-Reality")
+
+ggsave(paste(Sys.Date(), "Eco-realityAverageOverTime.pdf"),
+       width = 12, height = 25, units = "cm"
+)
 
 # Identification of most eco-real articles and least eco-real articles
 df_Transplant %>%
