@@ -134,34 +134,7 @@ ggsave(paste(Sys.Date(), "CumulativeSumArticles.pdf"),
        width = 18, height = 14, units = "cm"
 )
 
-#Figure 2 - How much is ecological microbiome now differentiating from medical microbiome literature (our study and other inspired by medical literature - is present literature still biased by medical literature?)
-df_Transplant %>%
-  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
-  mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
-  group_by(Year) %>%
-  summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
-  select(Year,DonorLabRodent,DonorOther,RecipLabRodent,RecipOther) %>%
-  gather(Type, Total, -Year) %>%
-  mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
-  mutate(Type = str_remove(Type, "Donor")) %>%
-  mutate(Type = str_remove(Type, "Recip")) %>%
-  ggplot()+
-  geom_col(aes(x = Year, y = Total, fill = Type )) +
-  facet_grid(.~DonorRecip)+
-  theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
-        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
-  scale_fill_viridis(
-    name = "Taxon Type", breaks = c("LabRodent", "Other"),
-    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
-    direction = 1, discrete = TRUE, option = "D"
-  ) +
-  ylab("Count")
-
-ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
-       width = 18, height = 12, units = "cm"
-)
-
-## Figure 3 - What status of eco-reality in present literature?
+## Figure 2 - What status of eco-reality in present literature?
 df_Transplant %>%
   dplyr::select(LabRodent.Recip, starts_with("Eco-Reality")) %>%
   # select the relevant columns for the plotting function
@@ -201,89 +174,82 @@ ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
 # save the figure so everyone does not have to run the script
 
 
-#Figure 4 - Is there improvement of eco-reality over time?
+#Figure 2 
 df_Transplant %>%
-  dplyr::select(Year, starts_with("Eco-Reality")) %>%
-  # select the relevant columns for the plotting function
-  mutate(`Eco-Reality of Taxon Match` = ifelse(`Eco-Reality Taxon Match`=="Match",2,1)) %>%
-  select(-`Eco-Reality Taxon Match`) %>%
-  gather(starts_with("Eco-Reality of"), key = "Type", value = "Eco-Reality") %>%
-  mutate(Type = str_remove(Type, "Eco-Reality of ")) %>%
-  mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
-  mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
-  mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
-  mutate(Type = str_replace(Type, " ", "\n")) %>%
-  # create the long format for ease of plotting
-  # not necessary to create individual figures (see code below)
-  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
-         Type = factor(Type,levels=c("Taxon\nMatch","Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))  %>% 
-  ggplot() +
-  geom_jitter(aes(x = Year, y = `Eco-Reality`),width=0.25,height=0) +
-  geom_smooth(aes(x = Year, y = `Eco-Reality`), method=lm, se=FALSE)+
-  facet_grid(Type~., scales = "free_y") +
-  theme(legend.position = "top",
-        strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
-        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
-scale_y_continuous(breaks = function(x) pretty(x)[pretty(x) %% 1 == 0]) +
-  # scale_colour_viridis(
-  #   name = "Taxon Match", breaks = c("Match", "Mismatch"),
-  #   labels = c("Match", "Mismatch"), alpha = 1, begin = 0, end = 0.5,
-  #   direction = 1, discrete = TRUE, option = "plasma"
-  # )+
-  # scale_size(name = "Number of Transplant Conditions")+
-  ylab("Eco-Reality")
-
-ggsave(paste(Sys.Date(), "Eco-realityOverTime.pdf"),
-       width = 12, height = 25, units = "cm"
-)
-
-
-#Attempt at standardisation of eco-reality
-df_Transplant %>%
-  dplyr::select(Year, PdFName, starts_with("Eco-Reality")) %>%
-  # select the relevant columns for the plotting function
-  mutate(`Eco-Reality of Taxon Match` = ifelse(`Eco-Reality Taxon Match`=="Match",2,1), PdFName= as.factor(PdFName)) %>%
-  select(-`Eco-Reality Taxon Match`) %>%
-  mutate(`Eco-Reality of Donor Environment (1-5)`=as.integer(`Eco-Reality of Donor Environment (1-5)`), `Eco-Reality of Donor Physiology (1-2)`=as.integer(`Eco-Reality of Donor Physiology (1-2)`),`Eco-Reality of Housing Method (1-2)`=as.integer(`Eco-Reality of Housing Method (1-2)`)) %>%
-  mutate(zTM=scale(`Eco-Reality of Transplanted Microbiome (1-3)`, center = TRUE, scale = TRUE),zDE=scale(`Eco-Reality of Donor Environment (1-5)`, center = TRUE, scale = TRUE),zDP=scale(`Eco-Reality of Donor Physiology (1-2)`, center = TRUE, scale = TRUE),zRM=scale(`Eco-Reality of Recipient Microbiome (1-3)`, center = TRUE, scale = TRUE),zRE=scale(`Eco-Reality of Recipient Environment (1-5)`, center = TRUE, scale = TRUE),zRP=scale(`Eco-Reality of Recipient Physiology (1-2)`, center = TRUE, scale = TRUE),zTMe=scale(`Eco-Reality of Transplant Method (1-2)`, center = TRUE, scale = TRUE),zHM=scale(`Eco-Reality of Housing Method (1-2)`, center = TRUE, scale = TRUE),zTaM=scale(`Eco-Reality of Taxon Match`, center = TRUE, scale = TRUE))%>%
-  mutate(sumER = as.numeric(zTM+zDE+zDP+zRM+zRE+zRP+zTMe+zHM+zTaM)) %>%
-  ungroup %>%
-  select(Year,PdFName,sumER)%>%
-  group_by(Year,PdFName) %>%
-  summarise(AvER = mean(sumER, na.rm=TRUE)) %>%
+  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
+  mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
+  group_by(Year) %>%
+  summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
+  select(Year,DonorLabRodent,DonorOther,RecipLabRodent,RecipOther) %>%
+  gather(Type, Total, -Year) %>%
+  mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
+  mutate(Type = str_remove(Type, "Donor")) %>%
+  mutate(Type = str_remove(Type, "Recip")) %>%
   ggplot()+
-  geom_point(aes(Year, AvER))+
-  ylab("Average Standardized Eco-Reality")
+  geom_col(aes(x = Year, y = Total, fill = Type )) +
+  facet_grid(.~DonorRecip)+
+  theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
+        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
+  scale_fill_viridis(
+    name = "Taxon Type", breaks = c("LabRodent", "Other"),
+    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
+    direction = 1, discrete = TRUE, option = "D"
+  ) +
+  ylab("Count")
 
-ggsave(paste(Sys.Date(), "Eco-realityStandardOverTime.pdf"),
-       width = 12, height = 25, units = "cm"
+ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
+       width = 18, height = 12, units = "cm"
 )
 
-#attempt at eco-reality over time summed and averaged for each paper
 
-df_Transplant %>%
+#Figure 4 - Is there improvement of eco-reality over time?
+ecorealperpaper<-df_Transplant %>%
   dplyr::select(Year,PdFName, `Transplant Interaction`, starts_with("Eco-Reality")) %>%
   mutate(`Eco-Reality Taxon Match` = ifelse(`Eco-Reality Taxon Match` == "Match",2,1))%>%
   # select the relevant columns for the plotting function
-  gather(starts_with("Eco-Reality"), key = "Type", value = "Eco-Reality") %>%
-  mutate(Type = str_remove(Type, "Eco-Reality")) %>%
-  mutate(Type = str_remove(Type, " of ")) %>%
+  gather(starts_with("Eco-Reality"), key = "Type", value = "EcoRealityAbs") %>%
+  mutate(Type = str_remove(Type, "Eco-Reality ")) %>%
+  mutate(Type = str_remove(Type, "of ")) %>%
   mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
   mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
   mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
   # create the long format for ease of plotting
   # not necessary to create individual figures (see code below)
-  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`)) %>%
-  spread(Type, `Eco-Reality`) %>%
-  mutate(EcoRealSum = rowSums(.[3:11])) %>%
+  mutate(EcoRealityAbs=as.numeric(EcoRealityAbs))%>%
+  mutate(EcoReality = case_when(
+    Type=="Taxon Match" ~ EcoRealityAbs/2,
+    Type=="Donor Environment" ~ EcoRealityAbs/5,
+    Type=="Donor Physiology" ~ EcoRealityAbs/2,
+    Type=="Housing Method" ~ EcoRealityAbs/2,
+    Type=="Recipient Environment" ~ EcoRealityAbs/5,
+    Type=="Recipient Microbiome" ~ EcoRealityAbs/3,
+    Type=="Recipient Physiology" ~ EcoRealityAbs/2,
+    Type=="Transplant Method" ~ EcoRealityAbs/2,
+    Type=="Transplanted Microbiome" ~ EcoRealityAbs/3)) %>%
+  select(-EcoRealityAbs)%>%
+  spread(Type, EcoReality) %>%
+  mutate(EcoRealSum = rowSums(.[4:11])) %>%
   group_by(Year,PdFName) %>%
-  summarise(AvER = mean(EcoRealSum, na.rm=TRUE)) %>%
-  ggplot()+
-  geom_point(aes(Year, AvER))+
-  ylab("Average Eco-Reality")
+  summarise(AvER = mean(EcoRealSum, na.rm=TRUE))
 
-ggsave(paste(Sys.Date(), "Eco-realityAverageOverTime.pdf"),
-       width = 12, height = 25, units = "cm"
+
+  ggplot(ecorealperpaper)+
+    geom_hline(yintercept=3.933333)+
+    geom_hline(yintercept=7.1)+
+  geom_point(aes(Year, AvER))+
+  geom_smooth(aes(Year, AvER), method=lm, se=TRUE)+
+  geom_hline(yintercept=3.566667)+
+  geom_hline(yintercept=9)+
+  scale_y_continuous(limits=c(3.5,9))+ #3.5666667 is the lowest score a paper can have, 9 is the highest score a paper can have
+  ylab("Average Standardized Eco-Reality")
+
+#Ideas for figure
+#could find the transplant condition with highest/lowest ecoreality score - plot line at this value.
+#find the paper with the highest lowest ecoreality score average - plot line at this value
+#cone showing increasing variation
+
+ggsave(paste(Sys.Date(), "Eco-realityAverageStandardOverTime.pdf"),
+       width = 18, height = 14, units = "cm"
 )
 
 # Identification of most eco-real articles and least eco-real articles
