@@ -118,23 +118,37 @@ df_Transplant %>%
   group_by(`Eco-Reality Taxon Match`, LabRodent.Donor, LabRodent.Recip) %>%
   summarise(MatchCount = length(`Number of Treatment Groups`))
 
-## Summary figures --------
+## Figures --------
 
-#Figure 1 - Are microbiome studies increasing over time?
-
+#Figure 1 
 df_Transplant %>%
-  select(PdFName,Year) %>%
-  group_by(Year) %>% 
-  summarise(Count = length(unique(PdFName))) %>%
-  ggplot() +
-  geom_line(aes(x = Year, y = cumsum(Count))) +
-  ylab("cumulative sum of articles")
+  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
+  mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
+  group_by(Year) %>%
+  summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
+  select(Year,DonorLabRodent,DonorOther,RecipLabRodent,RecipOther) %>%
+  gather(Type, Total, -Year) %>%
+  mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
+  mutate(Type = str_remove(Type, "Donor")) %>%
+  mutate(Type = str_remove(Type, "Recip")) %>%
+  ggplot()+
+  geom_col(aes(x = Year, y = Total, fill = Type )) +
+  facet_grid(.~DonorRecip)+
+  theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
+        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
+  scale_fill_viridis(
+    name = "Taxon Type", breaks = c("LabRodent", "Other"),
+    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
+    direction = 1, discrete = TRUE, option = "D"
+  ) +
+  ylab("Count")
 
-ggsave(paste(Sys.Date(), "CumulativeSumArticles.pdf"),
-       width = 18, height = 14, units = "cm"
+ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
+       width = 18, height = 12, units = "cm"
 )
 
-## Figure 2 - What status of eco-reality in present literature?
+
+## Figure 2
 df_Transplant %>%
   dplyr::select(LabRodent.Recip, starts_with("Eco-Reality")) %>%
   # select the relevant columns for the plotting function
@@ -174,35 +188,7 @@ ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
 # save the figure so everyone does not have to run the script
 
 
-#Figure 2 
-df_Transplant %>%
-  select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
-  mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
-  group_by(Year) %>%
-  summarise(DonorLabRodent = sum(LabRodent.DonorBin==1),DonorOther = sum(LabRodent.DonorBin==0),RecipLabRodent = sum(LabRodent.RecipBin==1), RecipOther = sum(LabRodent.RecipBin==0)) %>%
-  select(Year,DonorLabRodent,DonorOther,RecipLabRodent,RecipOther) %>%
-  gather(Type, Total, -Year) %>%
-  mutate(DonorRecip = ifelse(grepl("Donor", Type),"Donor", "Recipient")) %>%
-  mutate(Type = str_remove(Type, "Donor")) %>%
-  mutate(Type = str_remove(Type, "Recip")) %>%
-  ggplot()+
-  geom_col(aes(x = Year, y = Total, fill = Type )) +
-  facet_grid(.~DonorRecip)+
-  theme(strip.background=element_blank(),strip.text.x=element_text(size=10),strip.text.y=element_text(size=10),
-        axis.title.y=element_text(hjust=0.5, vjust=1.5),legend.text=element_text(size=15)) +
-  scale_fill_viridis(
-    name = "Taxon Type", breaks = c("LabRodent", "Other"),
-    labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
-    direction = 1, discrete = TRUE, option = "D"
-  ) +
-  ylab("Count")
-
-ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
-       width = 18, height = 12, units = "cm"
-)
-
-
-#Figure 4 - Is there improvement of eco-reality over time?
+#Figure 3 - Is there improvement of eco-reality over time?
 ecorealperpaper<-df_Transplant %>%
   dplyr::select(Year,PdFName, `Transplant Interaction`, starts_with("Eco-Reality")) %>%
   mutate(`Eco-Reality Taxon Match` = ifelse(`Eco-Reality Taxon Match` == "Match",2,1))%>%
@@ -230,7 +216,8 @@ ecorealperpaper<-df_Transplant %>%
   spread(Type, EcoReality) %>%
   mutate(EcoRealSum = rowSums(.[4:11])) %>%
   group_by(Year,PdFName) %>%
-  summarise(AvER = mean(EcoRealSum, na.rm=TRUE))
+  summarise(AvER = mean(EcoRealSum, na.rm=TRUE)) %>%
+  arrange(AvER)
 
 
   ggplot(ecorealperpaper)+
@@ -252,102 +239,4 @@ ggsave(paste(Sys.Date(), "Eco-realityAverageStandardOverTime.pdf"),
        width = 18, height = 14, units = "cm"
 )
 
-# Identification of most eco-real articles and least eco-real articles
-df_Transplant %>%
-  dplyr::select(PdFName, `Transplant Interaction`, starts_with("Eco-Reality")) %>%
-  mutate(`Eco-Reality Taxon Match` = ifelse(`Eco-Reality Taxon Match` == "Match",2,1))%>%
-  # select the relevant columns for the plotting function
-  gather(starts_with("Eco-Reality"), key = "Type", value = "Eco-Reality") %>%
-  mutate(Type = str_remove(Type, "Eco-Reality")) %>%
-    mutate(Type = str_remove(Type, " of ")) %>%
-  mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
-  mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
-  mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
-  # create the long format for ease of plotting
-  # not necessary to create individual figures (see code below)
-  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`)) %>%
-  spread(Type, `Eco-Reality`) %>%
-  mutate(EcoRealSum = rowSums(.[3:11])) %>%
-  group_by(PdFName) %>%
-  summarise(EcoRealArtMax = max(EcoRealSum), EcoRealArtMin = min(EcoRealSum)) %>%
-  arrange(EcoRealArtMax) %>%
-  View()
-  
-  
-## individual figures (>_<) -------
 
-## leave it here bc might need it in the future
-## for simplicity's sake, just collapse the code in RStudio
-
-## Histogram Donor Microbiome
-# df_Transplant %>%
-#  ggplot () +
-#   geom_histogram (aes(x = `Eco-Reality of Donor Microbiome (1-3)`,
-#                      fill = Rodent.Recip),
-#                  binwidth = 1) +
-#    facet_wrap (~ `Eco-Reality of Taxon Match`)
-# #==> NA panel is caused by the 6 new articles
-# # TODO: rerun after all the data are added/verified
-#
-# #Histogram Recipient Microbiome
-# df_Transplant %>%
-#   ggplot () +
-#   geom_histogram (aes(x = `Eco-Reality of Recipient Microbiome (1-5)`,
-#                       fill = Rodent.Recip),
-#                   binwidth = 1) +
-#   facet_wrap (~ `Eco-Reality of Taxon Match`)
-#
-# #Histogram Donor Environment
-# df_Transplant %>%
-#   ggplot () +
-#   geom_histogram (aes(x = `Eco-Reality of Recipient Microbiome (1-5)`,
-#                       fill = Rodent.Recip),
-#                   binwidth = 1) +
-#   facet_wrap (~ `Eco-Reality of Taxon Match`)
-#
-#  ggplot () +
-#    geom_histogram (data = df_Transplant,
-#                    aes(x = Eco.Reality.Donor.Environment..1.5.,
-#                        fill = Rodent.Recip),
-#                    binwidth = 1) +
-#    facet_wrap (~ Eco.Reality.of.Taxon.Match)
-#
-#  #Histogram Recipient Environment
-#  ggplot () +
-#    geom_histogram (data = df_Transplant,
-#                    aes(x = Eco.Reality.of.Recipient.Environment..1.5.,
-#                        fill = Rodent.Recip),
-#                    binwidth = 1) +
-#    facet_wrap (~ Eco.Reality.of.Taxon.Match)
-#
-#  #Histogram Donor Physiology
-#  ggplot () +
-#    geom_histogram (data = df_Transplant,
-#                    aes(x = Eco.Reality.Donor.Physiology..1.2.,
-#                        fill = Rodent.Recip),
-#                    binwidth = 1) +
-#    facet_wrap(~Eco.Reality.of.Taxon.Match)
-#
-#  #Histogram Recipient Physiology
-#  ggplot () +
-#    geom_histogram (data = df_Transplant,
-#                    aes(x = Eco.Reality.of.Recipient.Physiology..1.2.,
-#                   fill = Rodent.Recip),
-#                   binwidth = 1) +
-#    facet_wrap (~ Eco.Reality.of.Taxon.Match)
-#
-#  #Histogram Transplant Method
-#  ggplot () +
-#    geom_histogram (data = df_Transplant,
-#                    aes(x = Eco.Reality.of.Transplant.Method..1.2.,
-#                        fill = Rodent.Recip),
-#                    binwidth = 1) +
-#    facet_wrap (~ Eco.Reality.of.Taxon.Match)
-#
-#  #Histogram Housing Method
-#   ggplot () +
-#    geom_histogram (data = df_Transplant,
-#                    aes(x = Eco.Reality.of.Housing.Method..1.2.,
-#                    fill = Rodent.Recip),
-#                    binwidth = 1) +
-#    facet_wrap (~ Eco.Reality.of.Taxon.Match)
