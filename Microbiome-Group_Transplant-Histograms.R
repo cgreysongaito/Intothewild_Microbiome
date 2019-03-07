@@ -118,6 +118,15 @@ df_Transplant %>%
   group_by(`Eco-Reality Taxon Match`, LabRodent.Donor, LabRodent.Recip) %>%
   summarise(MatchCount = length(`Number of Treatment Groups`))
 
+# Calculation of cumulative number of publications
+df_Transplant %>%
+  select(PdFName,Year) %>%
+  group_by(Year) %>%
+  summarise(Count = length(unique(PdFName))) %>%
+  ggplot() +
+  geom_line(aes(x = Year, y = cumsum(Count))) +
+  ylab("cumulative sum of articles")
+
 ## Figures --------
 
 #Figure 1 
