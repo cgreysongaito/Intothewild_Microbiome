@@ -130,6 +130,11 @@ df_Transplant %>%
 ## Figures --------
 
 #Figure 1 
+
+# necessary data frame to add letters to the plot
+ann_fig1 = data.frame(DonorRecip = c("Donor","Recipient"),
+                      label = c("(A)", "(B)"))
+
 df_Transplant %>%
   select(PdFName,Year,LabRodent.Donor,LabRodent.Recip) %>% 
   mutate(LabRodent.DonorBin = ifelse(LabRodent.Donor == "LabRodent",1,0),LabRodent.RecipBin = ifelse(LabRodent.Recip == "LabRodent",1,0)) %>%
@@ -150,7 +155,11 @@ df_Transplant %>%
     labels = c("lab rodent", "other"), alpha = 1, begin = 0, end = 1,
     direction = 1, discrete = TRUE, option = "D"
   ) +
-  ylab("Count")
+  ylab("Count") +
+  geom_text(data = ann_fig1, 
+            mapping = aes(x = 2007, y = 43, label = label))
+            # hjust = -0.1,
+            # vjust = -1)
 
 ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
        width = 18, height = 12, units = "cm"
@@ -158,6 +167,16 @@ ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
 
 
 ## Figure 2
+
+ann_fig2 = data.frame(Type = c("Taxon\nMatch","Donor\nEnvironment",
+                               "Donor\nPhysiology","Transplanted\nMicrobiome",
+                               "Transplant\nMethod","Recipient\nMicrobiome",
+                               "Recipient\nEnvironment","Recipient\nPhysiology",
+                               "Housing\nMethod"),
+                      label = c("(A)", "(B)", "(C)", "(D)", "(E)",
+                                "(F)", "(G)", "(H)", "(I)"))
+
+
 df_Transplant %>%
   dplyr::select(LabRodent.Recip, starts_with("Eco-Reality")) %>%
   # select the relevant columns for the plotting function
@@ -189,7 +208,10 @@ df_Transplant %>%
   ) +
   scale_x_continuous(breaks = function(x) pretty(x)[pretty(x) %% 1 == 0]) +
   # https://stackoverflow.com/questions/15622001/how-to-display-only-integer-values-on-an-axis-using-ggplot2
-  xlab("Eco-Reality")+ylab("Count")
+  xlab("Eco-Reality") + 
+  ylab("Count") +
+  geom_text(data = ann_fig2, 
+            mapping = aes(x = 1, y = 120, label = label))
 
 ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
   width = 25, height = 12, units = "cm"
