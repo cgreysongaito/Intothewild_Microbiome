@@ -1,10 +1,14 @@
 ##############################
-## Microbiome meta-analysis
+##Into the wild: understanding the breadth of host-microbiome interactions
 ##
-## Mason Stothart, Tim Bartley, Karl Cottenie, Chris Greyson-Gaito, Will Jarvis, Amy Newman
+## Christopher J. Greyson-Gaito, Timothy J. Bartley, Karl Cottenie, Will M.C. Jarvis, Amy E.M. Newman, Mason Stothart
 ##
-## 2018-11-19
+## R script to create figures in manuscript
+## 
+## Beginning of coding - 2018-11-19
+## Version 1.0 - 
 ##
+## As of 2019-03-11, works with R version 3.5.2 (see packages for their versions)
 ##############################
 
 theme_simple <- function() {
@@ -25,31 +29,13 @@ theme_simple <- function() {
     )
 }
 
-library("tidyverse")
+library("tidyverse") #Version 1.2.1
 theme_set(theme_simple())
-library(viridis)
-library(googlesheets)
-# + scale_color/fill_viridis(discrete = T/F)
-# theme_set(theme_light())
-
-# Startup ends here
+library(viridis) #Version 0.5.1
 
 ## Read in data -----
 
-df_Transplant <- gs_url("https://docs.google.com/spreadsheets/d/1WhRjoIFJWAAGvsFNHbrf2GZp8K6pNtxoudrhZ6h82ZM/edit") %>%
-  # create unique identifyer
-  gs_read() %>%
-  # reads the data into R
-  write_csv(paste(Sys.Date(), "Microbiome_Literature_Summaries.csv"))
-# and automatically create timestamped .csv for safety and repeatability
-
-## execute line below if you want to repeat analysis from a certain date
-# df_Transplant = read_csv("2018-11-20 Microbiome_Literature_Summaries.csv")
-
-attr(df_Transplant, "CreatedOn") <- Sys.Date()
-# add the same date as an attribute to the R object
-glimpse(df_Transplant)
-str(df_Transplant) # check last line for date attribute
+df_Transplant <- read_csv("Microbiome_Literature_Summaries.csv")
 
 ## Data wrangling -----
 
@@ -63,53 +49,31 @@ donors <- df_Transplant %>%
   dplyr::select(`Donor Taxon`) %>%
   unique() %>%
   arrange(`Donor Taxon`) %>%
-  pull()
-
-donors
-
-donors <- tibble(`Donor Taxon` = donors) %>%
   mutate(LabRodent.Donor = ifelse(`Donor Taxon` %in% labrodents, "LabRodent", "Other"))
 
 recipients <- df_Transplant %>%
   dplyr::select(`Recipient Taxon`) %>%
   unique() %>%
   arrange(`Recipient Taxon`) %>%
-  pull()
-
-recipients # check which are rodents
-
-
-
-recipients <- tibble(`Recipient Taxon` = recipients) %>%
   mutate(LabRodent.Recip = ifelse(`Recipient Taxon` %in% labrodents, "LabRodent", "Other"))
 
-recipients %>% View()
-# TODO: after new import, check the above line if new recipient were added
-# TODO: if necessary, adjust labrodent vector
-
-## create new column with lookup table and left_join
+## create new column for whether donor or recipient host was a labrodent or other
 df_Transplant <- left_join(df_Transplant, recipients, by = "Recipient Taxon") %>%
   left_join(donors, by = "Donor Taxon")
 
-df_Transplant %>%
-  dplyr::select(`Donor Taxon`, LabRodent.Donor,`Recipient Taxon`, LabRodent.Recip) %>%
-  View()
-# check if conversion was done correctly
-# easiest to do by sorting the Rodent column in the viewer
-
 # Calculation of number of papers (assuming PdFName are unique for each article)
-length(unique(df_Transplant$PdFName)) #55 articles
+length(unique(df_Transplant$PdFName)) #54 articles
 
-# Calculation of number of transplant conditions
-length(df_Transplant$PdFName) #150 transplant conditions (rows)
+# Calculation of number of transplant instances
+length(df_Transplant$PdFName) #152 transplant instances (rows)
 
-# Calculation of average number of transplant conditions per article
+# Calculation of average number of transplant instances per article
 summary(df_Transplant %>%
   group_by(PdFName) %>%
   summarise(TransplantCount = length(`Transplant Interaction`)) %>%
- select(TransplantCount)) # mean 2.727
+ select(TransplantCount)) # mean 2.815
 
-# Calculation of number of match and mismatch transplant conditions and number of lab rodents and other
+# Calculation of number of match and mismatch transplant instances and number of lab rodents and other
 df_Transplant %>%
   group_by(`Eco-Reality Taxon Match`) %>%
   summarise(MatchCount = length(`Number of Treatment Groups`))
@@ -216,10 +180,9 @@ df_Transplant %>%
 ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
   width = 25, height = 12, units = "cm"
 )
-# save the figure so everyone does not have to run the script
 
 
-#Figure 3 - Is there improvement of eco-reality over time?
+#Figure 3
 ecorealperpaper<-df_Transplant %>%
   dplyr::select(Year,PdFName, `Transplant Interaction`, starts_with("Eco-Reality")) %>%
   mutate(`Eco-Reality Taxon Match` = ifelse(`Eco-Reality Taxon Match` == "Match",2,1))%>%
@@ -260,11 +223,6 @@ ecorealperpaper<-df_Transplant %>%
   geom_hline(yintercept=9)+
   scale_y_continuous(limits=c(3.5,9))+ #3.5666667 is the lowest score a paper can have, 9 is the highest score a paper can have
   ylab("Average Standardized Eco-Reality")
-
-#Ideas for figure
-#could find the transplant condition with highest/lowest ecoreality score - plot line at this value.
-#find the paper with the highest lowest ecoreality score average - plot line at this value
-#cone showing increasing variation
 
 ggsave(paste(Sys.Date(), "Eco-realityAverageStandardOverTime.pdf"),
        width = 18, height = 14, units = "cm"
