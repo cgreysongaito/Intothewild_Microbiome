@@ -35,7 +35,7 @@ library(viridis) #Version 0.5.1
 
 ## Read in data -----
 
-df_Transplant <- read_csv("EcoRealTable-2019-03-25 - Data.csv")
+df_Transplant <- read_csv("data/EcoRealTable_2019-03-25_Data.csv")
 
 ## Data wrangling -----
 
