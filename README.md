@@ -5,7 +5,7 @@
 
 #### Authors (working order - can be changed)
 
-Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:/sup>, Timothy J. Bartley<sup>1,2,:heavy_plus_sign:/sup>, Karl Cottenie<sup>1,:heavy_plus_sign:/sup>, William Jarvis<sup>3,:heavy_plus_sign:/sup>, Amy E.M. Newman<sup>1,:heavy_plus_sign:/sup>, Mason R. Stothart<sup>4,:heavy_plus_sign:/sup>
+Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<sup>1,2,:heavy_plus_sign:</sup>, Karl Cottenie<sup>1,:heavy_plus_sign:</sup>, William Jarvis<sup>3,:heavy_plus_sign:</sup>, Amy E.M. Newman<sup>1,:heavy_plus_sign:</sup>, Mason R. Stothart<sup>4,:heavy_plus_sign:</sup>
 
 #### Affiliations
 
