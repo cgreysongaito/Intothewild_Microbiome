@@ -6,9 +6,9 @@
 ## R script to create figures in manuscript
 ## 
 ## Beginning of coding - 2018-11-19
-## Version 1.0 - 
+## Version 1.0 - 2019-04-25
 ##
-## As of 2019-03-11, works with R version 3.5.2 (see packages for their versions)
+## As of 2019-04-25, works with R version 3.5.3 (see packages for their versions)
 ##############################
 
 theme_simple <- function() {
@@ -86,6 +86,10 @@ df_Transplant %>%
   ggplot() +
   geom_line(aes(x = Year, y = cumsum(Count))) +
   ylab("cumulative sum of articles")
+
+ggsave(paste(Sys.Date(), "CumulativeSumArticles.pdf"),
+       width = 25, height = 12, units = "cm"
+)
 
 ## Figures --------
 

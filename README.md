@@ -1,9 +1,9 @@
 # README
 
-## Into the wild: understanding the breadth of host-microbiome interactions
+## Into the wild: microbiome transplant studies need broader ecological reality
 
 
-#### Authors (working order - can be changed)
+#### Authors
 
 Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<sup>1,2,:heavy_plus_sign:</sup>, Karl Cottenie<sup>1,:heavy_plus_sign:</sup>, William Jarvis<sup>3,:heavy_plus_sign:</sup>, Amy E.M. Newman<sup>1,:heavy_plus_sign:</sup>, Mason R. Stothart<sup>4,:heavy_plus_sign:</sup>
 
@@ -25,6 +25,7 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
     * 2019-03-07 CountAnimals.pdf	Figure 2 in manuscript
     * 2019-03-07 Eco-realityComparisons.pdf  Figure 3 in manuscript
     * 2019-03-07 Eco-realityAverageStandardOverTime.pdf  Figure 4 in manuscript
+    * 2019-04-25 CumulativeSumArticles.pdf  Supporting Information Figure 1
 * .gitignore  File containing files or folders that git should ignore
 * IntotheWilde_Microbiome_Greyson-Gaito_etal_2019.R  R script for analysis and figure creation
 * LICENSE  Mozilla Public License 2.0
@@ -39,7 +40,7 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 	* If not using RStudio, open the file Intothewild_Microbiome_Greyson-Gaito_etal_2019.R and edit the path to the data file called Microbiome_Literature_Summaries.csv to whatever path is required on your computer.
 * Run the script in RStudio or however you normally run R scripts.
 
-### Supplementary Information
+### Supporting Information
 
 #### Search terms used for methodological literature search
 
@@ -48,3 +49,5 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 * Web of Science
 	* ((TOPIC:(transplant*) AND TOPIC: (microbio*))AND (TOPIC: ((((((((gut OR fecal) OR feces) OR gastointestin*) OR gasto-intestin*) OR faecal) OR faeces) OR forces) OR faecal) NOT TOPIC:(((((human OR patient) OR homo sapiens) OR man) OR woman) OR child*)))
 
+![SI Figure 1](figs/2019-04-25CumulativeSumArticles.png)
+Figure 1 Cumulative sum of articles from our directed review between 2006 and 2018.
