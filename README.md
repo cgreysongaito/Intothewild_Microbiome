@@ -5,17 +5,32 @@
 
 #### Authors (working order - can be changed)
 
-Christopher J. Greyson-Gaito<sup>*1,5</sup>, Timothy J. Bartley<sup>1,2,5</sup>, Karl Cottenie<sup>1,5</sup>, William Jarvis<sup>3,5</sup>, Amy E.M. Newman<sup>1,5</sup>, Mason R. Stothart<sup>4,5</sup>
+Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:/sup>, Timothy J. Bartley<sup>1,2,:heavy_plus_sign:/sup>, Karl Cottenie<sup>1,:heavy_plus_sign:/sup>, William Jarvis<sup>3,:heavy_plus_sign:/sup>, Amy E.M. Newman<sup>1,:heavy_plus_sign:/sup>, Mason R. Stothart<sup>4,:heavy_plus_sign:/sup>
 
 #### Affiliations
 
 *Corresponding author - christopher@greyson-gaito.com
 
-1. University of Guelph, Department of Integrative Biology, Guelph, ON N1G 2W1, Canada
+1. University of Guelph, Department of Integrative Biology, Guelph, ON, Canada
 2. University of Toronto Mississauga, Mississauga, ON, Canada
-3. University of Ottawa, Department of Biology, Ottawa, ON K1N 6N5, Canada
+3. University of Ottawa, Department of Biology, Ottawa, ON,Canada
 4. University of Calgary, Calgary, AB, Canada
-5. All authors contributed equally
+
+:heavy_plus_sign: All authors contributed equally
+
+### Folder and file structure
+* data
+--* EcoRealTable_2019-03-25_Data.csv
+* figs
+--* 2019-03-07 CountAnimals.pdf	Figure 2 in manuscript
+--* 2019-03-07 Eco-realityComparisons.pdf  Figure 3 in manuscript
+--* 2019-03-07 Eco-realityAverageStandardOverTime.pdf  Figure 4 in manuscript
+* .gitignore  File containing files or folders that git should ignore
+* IntotheWilde_Microbiome_Greyson-Gaito_etal_2019.R  R script for analysis and figure creation
+* LICENSE  Mozilla Public License 2.0
+* README.md  Important information
+* meta_transplant_microbiome.Rproj  R Project to increase ease of use
+
 
 
 ### Instructions for use
