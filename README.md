@@ -49,6 +49,6 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 * Web of Science
 	* ((TOPIC:(transplant*) AND TOPIC: (microbio*))AND (TOPIC: ((((((((gut OR fecal) OR feces) OR gastointestin*) OR gasto-intestin*) OR faecal) OR faeces) OR forces) OR faecal) NOT TOPIC:(((((human OR patient) OR homo sapiens) OR man) OR woman) OR child*)))
 
-![SI Figure 1](figs/2019-04-25CumulativeSumArticles.png)
+![SI Figure 1](figs/2019-04-25CumulativeSumArticleslarge.png)
 
 Figure 1 Cumulative sum of articles from our directed review between 2006 and 2018.
