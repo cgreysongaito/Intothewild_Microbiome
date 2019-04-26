@@ -4,6 +4,7 @@
 
 # Session Data files
 .RData
+.DS_Store
 
 # Output files from R CMD check
 /*.Rcheck/
@@ -13,4 +14,4 @@
 .Rproj.user
 
 
-archived_images/
+archived_imagesdata/
