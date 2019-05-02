@@ -136,39 +136,39 @@ ann_fig2 = data.frame(Type = c("Taxon\nMatch","Donor\nEnvironment",
                                "Donor\nPhysiology","Transplanted\nMicrobiome",
                                "Transplant\nMethod","Recipient\nMicrobiome",
                                "Recipient\nEnvironment","Recipient\nPhysiology",
-                               "Housing\nMethod"),
+                               "Housing\nConditions"),
                       label = c("(A)", "(B)", "(C)", "(D)", "(E)",
                                 "(F)", "(G)", "(H)", "(I)"))
 
 
 ecoreality_conditions <- df_Transplant %>%
-  dplyr::select(LabRodent.Recip, starts_with("Eco-Reality")) %>%
+  dplyr::select(LabRodent.Recip, starts_with("EcoReality")) %>%
   # select the relevant columns for the plotting function
-  mutate(`Eco-Reality of Taxon Match` = ifelse(`Eco-Reality Taxon Match`=="Match",2,1)) %>%
-  select(-`Eco-Reality Taxon Match`) %>%
-  gather(starts_with("Eco-Reality of"), key = "Type", value = "Eco-Reality") %>%
-  mutate(Type = str_remove(Type, "Eco-Reality of ")) %>%
+  mutate(`EcoReality of Taxon Match` = ifelse(`EcoReality Taxon Match`=="Match",2,1)) %>%
+  select(-`EcoReality Taxon Match`) %>%
+  gather(starts_with("EcoReality of"), key = "Type", value = "EcoReality") %>%
+  mutate(Type = str_remove(Type, "EcoReality of ")) %>%
   mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
   mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
   mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
   mutate(Type = str_replace(Type, " ", "\n")) %>%
   # create the long format for ease of plotting
   # not necessary to create individual figures (see code below)
-  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
-         Type = factor(Type,levels=c("Taxon\nMatch","Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod")))
+  mutate(`EcoReality` = as.numeric(`EcoReality`),
+         Type = factor(Type,levels=c("Taxon\nMatch","Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nConditions")))
 
 AV_ecoreality_conditions <- ecoreality_conditions %>%
   group_by(Type)%>%
-  summarise(AvEcoReality=mean(`Eco-Reality`, na.rm=TRUE))%>%
+  summarise(AvEcoReality=mean(`EcoReality`, na.rm=TRUE))%>%
   mutate(EcoRealityMax=c(2,5,2,3,2,3,5,2,2), propEcoReality=AvEcoReality/EcoRealityMax)
   
 AV_ecoreality_conditions_recipienttaxon <- ecoreality_conditions %>%
   group_by(LabRodent.Recip,Type)%>%
-  summarise(AvEcoReality=mean(`Eco-Reality`, na.rm=TRUE))%>%
+  summarise(AvEcoReality=mean(`EcoReality`, na.rm=TRUE))%>%
   mutate(EcoRealityMax=c(2,5,2,3,2,3,5,2,2), propEcoReality=AvEcoReality/EcoRealityMax)
 
   ggplot(ecoreality_conditions) +
-  geom_bar(aes(x = `Eco-Reality`, 
+  geom_bar(aes(x = `EcoReality`, 
                      fill = LabRodent.Recip)) + 
   facet_grid (.~ Type, scales = "free_x",space = "free_x") +
   theme(legend.position = "top",
@@ -181,23 +181,23 @@ AV_ecoreality_conditions_recipienttaxon <- ecoreality_conditions %>%
   ) +
   scale_x_continuous(breaks = function(x) pretty(x)[pretty(x) %% 1 == 0]) +
   # https://stackoverflow.com/questions/15622001/how-to-display-only-integer-values-on-an-axis-using-ggplot2
-  xlab("Eco-Reality") + 
+  xlab("EcoReality") + 
   ylab("Count") +
   geom_text(data = ann_fig2, 
             mapping = aes(x = 1, y = 120, label = label))
 
-ggsave(paste(Sys.Date(), "Eco-realityComparisons.pdf"),
+ggsave(paste(Sys.Date(), "EcoRealityComparisons.pdf"),
   width = 25, height = 12, units = "cm"
 )
 
 
 #Figure 3
 ecorealperpaper<-df_Transplant %>%
-  dplyr::select(Year,PdFName, `Transplant Instance`, starts_with("Eco-Reality")) %>%
-  mutate(`Eco-Reality Taxon Match` = ifelse(`Eco-Reality Taxon Match` == "Match",2,1))%>%
+  dplyr::select(Year,PdFName, `Transplant Instance`, starts_with("EcoReality")) %>%
+  mutate(`EcoReality Taxon Match` = ifelse(`EcoReality Taxon Match` == "Match",2,1))%>%
   # select the relevant columns for the plotting function
-  gather(starts_with("Eco-Reality"), key = "Type", value = "EcoRealityAbs") %>%
-  mutate(Type = str_remove(Type, "Eco-Reality ")) %>%
+  gather(starts_with("EcoReality"), key = "Type", value = "EcoRealityAbs") %>%
+  mutate(Type = str_remove(Type, "EcoReality ")) %>%
   mutate(Type = str_remove(Type, "of ")) %>%
   mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
   mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
@@ -209,7 +209,7 @@ ecorealperpaper<-df_Transplant %>%
     Type=="Taxon Match" ~ EcoRealityAbs/2,
     Type=="Donor Environment" ~ EcoRealityAbs/5,
     Type=="Donor Physiology" ~ EcoRealityAbs/2,
-    Type=="Housing Method" ~ EcoRealityAbs/2,
+    Type=="Housing Conditions" ~ EcoRealityAbs/2,
     Type=="Recipient Environment" ~ EcoRealityAbs/5,
     Type=="Recipient Microbiome" ~ EcoRealityAbs/3,
     Type=="Recipient Physiology" ~ EcoRealityAbs/2,
@@ -224,16 +224,14 @@ ecorealperpaper<-df_Transplant %>%
 
 
   ggplot(ecorealperpaper)+
-    geom_hline(yintercept=3.933333)+
-    geom_hline(yintercept=7.1)+
   geom_point(aes(Year, AvER))+
-  geom_smooth(aes(Year, AvER), method=lm, se=TRUE)+
+  geom_smooth(aes(Year, AvER), method=lm, se=FALSE)+
   geom_hline(yintercept=3.566667)+
   geom_hline(yintercept=9)+
   scale_y_continuous(limits=c(3.5,9))+ #3.5666667 is the lowest score a paper can have, 9 is the highest score a paper can have
-  ylab("Average Standardized Eco-Reality")
+  ylab("Average Standardized EcoReality")
 
-ggsave(paste(Sys.Date(), "Eco-realityAverageStandardOverTime.pdf"),
+ggsave(paste(Sys.Date(), "EcoRealityAverageStandardOverTime.pdf"),
        width = 18, height = 14, units = "cm"
 )
 
@@ -241,36 +239,36 @@ ggsave(paste(Sys.Date(), "Eco-realityAverageStandardOverTime.pdf"),
 
 # How many of the recipient microbiomes 1 are gnobiotic bees.
 bees <- df_Transplant %>%
-  dplyr::select(`Recipient Taxon`, LabRodent.Recip, starts_with("Eco-Reality")) %>%
+  dplyr::select(`Recipient Taxon`, LabRodent.Recip, starts_with("EcoReality")) %>%
   # select the relevant columns for the plotting function
-  mutate(`Eco-Reality of Taxon Match` = ifelse(`Eco-Reality Taxon Match`=="Match",2,1)) %>%
-  select(-`Eco-Reality Taxon Match`) %>%
-  gather(starts_with("Eco-Reality of"), key = "Type", value = "Eco-Reality") %>%
-  mutate(Type = str_remove(Type, "Eco-Reality of ")) %>%
+  mutate(`EcoReality of Taxon Match` = ifelse(`EcoReality Taxon Match`=="Match",2,1)) %>%
+  select(-`EcoReality Taxon Match`) %>%
+  gather(starts_with("EcoReality of"), key = "Type", value = "EcoReality") %>%
+  mutate(Type = str_remove(Type, "EcoReality of ")) %>%
   mutate(Type = str_remove(Type, " \\(1-3\\)")) %>%
   mutate(Type = str_remove(Type, " \\(1-5\\)")) %>%
   mutate(Type = str_remove(Type, " \\(1-2\\)")) %>%
   mutate(Type = str_replace(Type, " ", "\n")) %>%
   # create the long format for ease of plotting
   # not necessary to create individual figures (see code below)
-  mutate(`Eco-Reality` = as.numeric(`Eco-Reality`),
-         Type = factor(Type,levels=c("Taxon\nMatch","Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nMethod"))) %>%
+  mutate(`EcoReality` = as.numeric(`EcoReality`),
+         Type = factor(Type,levels=c("Taxon\nMatch","Donor\nEnvironment","Donor\nPhysiology","Transplanted\nMicrobiome","Transplant\nMethod","Recipient\nMicrobiome","Recipient\nEnvironment","Recipient\nPhysiology","Housing\nConditions"))) %>%
   filter(Type=="Recipient\nMicrobiome") %>%
-  filter(`Eco-Reality`==1)
+  filter(`EcoReality`==1)
   
 table(bees$`Recipient Taxon`)
 
 nrow(bees)
 # Find articles for bees in recipient microbiom 1
 beearticle <- df_Transplant %>%
-  dplyr::select(PdFName,`Recipient Taxon`, `Eco-Reality of Recipient Microbiome (1-3)`)%>%
-  filter(`Eco-Reality of Recipient Microbiome (1-3)`==1) %>%
+  dplyr::select(PdFName,`Recipient Taxon`, `EcoReality of Recipient Microbiome (1-3)`)%>%
+  filter(`EcoReality of Recipient Microbiome (1-3)`==1) %>%
   filter(`Recipient Taxon` %in% c("bee", "bumblebee"))
 
 # Are zebrafish in Recipient microbiome 1 gnotobiotic too - find articles
 zebrafish <- df_Transplant %>%
-  dplyr::select(PdFName,`Recipient Taxon`, `Eco-Reality of Recipient Microbiome (1-3)`)%>%
-  filter(`Eco-Reality of Recipient Microbiome (1-3)`==1) %>%
+  dplyr::select(PdFName,`Recipient Taxon`, `EcoReality of Recipient Microbiome (1-3)`)%>%
+  filter(`EcoReality of Recipient Microbiome (1-3)`==1) %>%
   filter(`Recipient Taxon`=="zebrafish")
 
 
