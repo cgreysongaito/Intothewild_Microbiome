@@ -49,6 +49,21 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 * Web of Science
 	* ((TOPIC:(transplant*) AND TOPIC: (microbio*))AND (TOPIC: ((((((((gut OR fecal) OR feces) OR gastointestin*) OR gasto-intestin*) OR faecal) OR faeces) OR forces) OR faecal) NOT TOPIC:(((((human OR patient) OR homo sapiens) OR man) OR woman) OR child*)))
 
+#### Ordinal data scale (EcoReality score) for each experimental condition
+
+| Experimental Condition  | Ordinal Data Scale                                                                                                                                                                                                                                                            |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Taxon Match             | 1 = Mismatch 2 = Match                                                                                                                                                                                                                                                        |
+| Donor Environment       | 1 = In-Lab in sterile environment 2 = Lab animal host in Non-Sterile Lab 3 = Captive Bred Wildlife (long time difference between capture and transplant) 4 = Wildlife brought into captivity (short time difference between capture and transplant) 5 = Free-Ranging Wildlife |
+| Donor Physiology        | 1 = Gene knockout/disease harbouring (non-microbial) 2 = Wildtype non-diseased                                                                                                                                                                                                |
+| Transplanted Microbiome | 1 = Single Strain 2 = Consortium, mixture of select strains 3 = Whole community                                                                                                                                                                                               |
+| Transplant Method       | 1 = Active (e.g., suppository, oral gavage) 2 = Passive (e.g., mixed into food)                                                                                                                                                                                               |
+| Recipient Microbiome    | 1 = Germ-Free 2 = Antibiotic Perturbed/Pathologic 3 = Whole community                                                                                                                                                                                                         |
+| Recipient Environment   | 1 = Lab animal host in Sterile Lab 2 = Lab animal host in Non-Sterile Lab 3 = Captive Bred Wildlife 4 = Wildlife brought into captivity 5 = Free-Ranging Wildlife                                                                                                             |
+| Recipient Physiology    | 1 = Gene knockout or disease harbouring (non-microbial) 2 = Wildtype or non-diseased                                                                                                                                                                                          |
+| Housing Conditions      | 1 = Housed Singly 2 = Co-Housed                                                                                                                                                                                                                                               |
+
 ![SI Figure 1](figs/2019-04-25CumulativeSumArticleslarge.png)
 
 Figure 1 Cumulative sum of articles from our directed review between 2006 and 2018.
+
