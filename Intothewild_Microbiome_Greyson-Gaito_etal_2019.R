@@ -35,7 +35,7 @@ library(viridis) #Version 0.5.1
 
 ## Read in data -----
 
-df_Transplant <- read_csv("data/EcoRealTable_2019-03-25_Data.csv")
+df_Transplant <- read_csv("data/EcoRealTable_2019-05-05_Data.csv")
 
 ## Data wrangling -----
 
@@ -67,7 +67,7 @@ df_Transplant <- left_join(df_Transplant, recipients, by = "Recipient Taxon") %>
   left_join(donors, by = "Donor Taxon")
 
 # Calculation of number of papers (assuming PdFName are unique for each article)
-length(unique(df_Transplant$PdFName)) #54 articles
+length(unique(df_Transplant$PdFName)) #53 articles
 
 # Calculation of number of transplant instances
 length(df_Transplant$PdFName) #152 transplant instances (rows)

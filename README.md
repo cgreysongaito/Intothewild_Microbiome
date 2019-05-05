@@ -63,7 +63,7 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 | Recipient Physiology    | 1 = Gene knockout or disease harbouring (non-microbial) <br> 2 = Wildtype or non-diseased |
 | Housing Conditions      | 1 = Housed Singly <br> 2 = Co-Housed |
 
-![SI Figure 1](figs/2019-04-25CumulativeSumArticleslarge.png)
+![SI Figure 1](figs/2019-05-05CumulativeSumArticleslarge.png)
 
 Figure 1 Cumulative sum of articles from our directed review between 2006 and 2018.
 
