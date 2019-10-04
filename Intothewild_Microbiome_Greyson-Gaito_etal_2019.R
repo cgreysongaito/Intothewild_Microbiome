@@ -225,7 +225,7 @@ ecorealperpaper<-df_Transplant %>%
 
   ggplot(ecorealperpaper)+
   geom_point(aes(Year, AvER))+
-  geom_smooth(aes(Year, AvER), method=lm, se=FALSE)+
+  geom_smooth(aes(Year, AvER))+
   geom_hline(yintercept=3.566667)+
   geom_hline(yintercept=9)+
   scale_y_continuous(limits=c(3.5,9))+ #3.5666667 is the lowest score a paper can have, 9 is the highest score a paper can have
