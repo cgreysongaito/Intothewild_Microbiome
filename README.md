@@ -22,15 +22,16 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 * data
     * EcoRealTable_2019-03-25_Data.csv
 * figs
-    * 2019-03-07 CountAnimals.pdf	Figure 2 in manuscript
-    * 2019-03-07 Eco-realityComparisons.pdf  Figure 3 in manuscript
-    * 2019-03-07 Eco-realityAverageStandardOverTime.pdf  Figure 4 in manuscript
-    * 2019-04-25 CumulativeSumArticles.pdf  Supporting Information Figure 1
-* .gitignore  File containing files or folders that git should ignore
-* IntotheWilde_Microbiome_Greyson-Gaito_etal_2019.R  R script for analysis and figure creation
-* LICENSE  Mozilla Public License 2.0
-* README.md  Important information
-* meta_transplant_microbiome.Rproj  R Project to increase ease of use
+    * 2019-03-07 CountAnimals.pdf &ndash; Figure 2 in manuscript
+    * 2019-03-07 Eco-realityComparisons.pdf &ndash;  Figure 3 in manuscript
+    * 2019-03-07 Eco-realityAverageStandardOverTime.pdf &ndash; Figure 4 in manuscript
+    * 2019-04-25 CumulativeSumArticles.pdf &ndash; Supporting Information Figure 1
+* .gitignore &ndash; File containing files or folders that git should ignore
+* IntotheWild_Microbiome_Greyson-Gaito_etal_2019.R &ndash; R script for analysis and figure creation
+* GreysonGaitoetal_Intothewild_SupportingInformation.pdf &ndash; Supporting information (search terms, ordinal data scales, figure)
+* LICENSE &ndash; Mozilla Public License 2.0
+* README.md &ndash; Important information
+* meta_transplant_microbiome.Rproj &ndash; R Project to increase ease of use
 
 
 
@@ -47,7 +48,7 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 * Google scholar
 	* (transplant* AND microbio*) (gut OR fecal OR feces OR gastointestin* OR gasto-intestin* OR faecal OR faeces OR forces OR faecal) -human -patient -"homo sapiens" -man -woman -child*
 * Web of Science
-	* ((TOPIC:(transplant*) AND TOPIC: (microbio*))AND (TOPIC: ((((((((gut OR fecal) OR feces) OR gastointestin*) OR gasto-intestin*) OR faecal) OR faeces) OR forces) OR faecal) NOT TOPIC:(((((human OR patient) OR homo sapiens) OR man) OR woman) OR child*)))
+	* ((TOPIC:(transplant*) AND TOPIC: (microbio*))AND (TOPIC: (((((((gut OR fecal) OR feces) OR gastointestin*) OR gasto-intestin*) OR faecal) OR faeces)  OR faecal) NOT TOPIC:(((((human OR patient) OR homo sapiens) OR man) OR woman) OR child*)))
 
 #### Ordinal data scale (EcoReality score) for each experimental condition
 
