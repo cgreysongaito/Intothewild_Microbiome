@@ -33,8 +33,6 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 * README.md &ndash; Important information
 * meta_transplant_microbiome.Rproj &ndash; R Project to increase ease of use
 
-
-
 ### Instructions for use
 * Download the whole repository (either by forking and cloning or by downloading a ZIP folder)
 * In RStudio, open the project called meta_transplant_microbiome.Rproj and open the file Intothewild_Microbiome_Greyson-Gaito_etal_2019.R
@@ -43,28 +41,4 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 
 ### Supporting Information
 
-#### Search terms used for methodological literature search
-
-* Google scholar
-	* (transplant* AND microbio*) (gut OR fecal OR feces OR gastointestin* OR gasto-intestin* OR faecal OR faeces OR forces OR faecal) -human -patient -"homo sapiens" -man -woman -child*
-* Web of Science
-	* ((TOPIC:(transplant*) AND TOPIC: (microbio*))AND (TOPIC: (((((((gut OR fecal) OR feces) OR gastointestin*) OR gasto-intestin*) OR faecal) OR faeces)  OR faecal) NOT TOPIC:(((((human OR patient) OR homo sapiens) OR man) OR woman) OR child*)))
-
-#### Ordinal data scale (EcoReality score) for each experimental condition
-
-| Experimental Condition  | Ordinal Data Scale                                                                                                                                                                                                                                                            |
-|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Taxon Match             | 1 = Mismatch <br> 2 = Match                                                                                                                                                                                                                                                        |
-| Donor Environment       | 1 = In-Lab in sterile environment <br> 2 = Lab animal host in Non-Sterile Lab <br>  3 = Captive Bred Wildlife (long time difference between capture and transplant) <br>  4 = Wildlife brought into captivity (short time difference between capture and transplant) <br> 5 = Free-Ranging Wildlife |
-| Donor Physiology        | 1 = Gene knockout/disease harbouring (non-microbial) <br> 2 = Wildtype non-diseased |
-| Transplanted Microbiome | 1 = Single Strain <br> 2 = Consortium, mixture of select strains <br> 3 = Whole community |
-| Transplant Method       | 1 = Active (e.g., suppository, oral gavage) <br> 2 = Passive (e.g., mixed into food)                                                                                                                                                                                               |
-| Recipient Microbiome    | 1 = Germ-Free <br> 2 = Antibiotic Perturbed/Pathologic <br> 3 = Whole community |
-| Recipient Environment   | 1 = Lab animal host in Sterile Lab <br> 2 = Lab animal host in Non-Sterile Lab <br> 3 = Captive Bred Wildlife <br> 4 = Wildlife brought into captivity <br> 5 = Free-Ranging Wildlife |
-| Recipient Physiology    | 1 = Gene knockout or disease harbouring (non-microbial) <br> 2 = Wildtype or non-diseased |
-| Housing Conditions      | 1 = Housed Singly <br> 2 = Co-Housed |
-
-![SI Figure 1](figs/2019-05-05CumulativeSumArticleslarge.png)
-
-Figure 1 Cumulative sum of articles from our directed review between 2006 and 2018.
-
+See GreysonGaitoetal_Intothewild_SupportingInformation.pdf
