@@ -35,7 +35,7 @@ library(viridis) #Version 0.5.1
 
 ## Read in data -----
 
-df_Transplant <- read_csv("data/EcoRealTable_2019-05-05_Data.csv")
+df_Transplant <- read_csv("data/EcoRealTable_2019-10-09_Data.csv")
 
 ## Data wrangling -----
 
@@ -67,16 +67,16 @@ df_Transplant <- left_join(df_Transplant, recipients, by = "Recipient Taxon") %>
   left_join(donors, by = "Donor Taxon")
 
 # Calculation of number of papers (assuming PdFName are unique for each article)
-length(unique(df_Transplant$PdFName)) #53 articles
+length(unique(df_Transplant$PdFName)) #55 articles
 
 # Calculation of number of transplant instances
-length(df_Transplant$PdFName) #152 transplant instances (rows)
+length(df_Transplant$PdFName) #160 transplant instances (rows)
 
 # Calculation of average number of transplant instances per article
 summary(df_Transplant %>%
   group_by(PdFName) %>%
   summarise(TransplantCount = length(`Transplant Instance`)) %>%
- select(TransplantCount)) # mean 2.815
+ select(TransplantCount)) # mean 2.909
 
 # Calculation of cumulative number of publications
 df_Transplant %>%
@@ -192,7 +192,7 @@ ggsave(paste(Sys.Date(), "EcoRealityComparisons.pdf"),
 
 
 #Figure 3
-ecorealperpaper<-df_Transplant %>%
+ecorealpertransplant<-df_Transplant %>%
   dplyr::select(Year,PdFName, `Transplant Instance`, starts_with("EcoReality")) %>%
   mutate(`EcoReality Taxon Match` = ifelse(`EcoReality Taxon Match` == "Match",2,1))%>%
   # select the relevant columns for the plotting function
@@ -215,23 +215,20 @@ ecorealperpaper<-df_Transplant %>%
     Type=="Recipient Physiology" ~ EcoRealityAbs/2,
     Type=="Transplant Method" ~ EcoRealityAbs/2,
     Type=="Transplanted Microbiome" ~ EcoRealityAbs/3)) %>%
-  select(-EcoRealityAbs)%>%
+  select(-EcoRealityAbs) %>%
   spread(Type, EcoReality) %>%
   mutate(EcoRealSum = rowSums(.[4:11])) %>%
-  group_by(Year,PdFName) %>%
-  summarise(AvER = mean(EcoRealSum, na.rm=TRUE)) %>%
-  arrange(AvER)
+  arrange(EcoRealSum)
 
 
-  ggplot(ecorealperpaper)+
-  geom_point(aes(Year, AvER))+
-  geom_smooth(aes(Year, AvER))+
+  ggplot(ecorealpertransplant)+
+  geom_point(aes(Year, EcoRealSum))+
   geom_hline(yintercept=3.566667)+
   geom_hline(yintercept=9)+
   scale_y_continuous(limits=c(3.5,9))+ #3.5666667 is the lowest score a paper can have, 9 is the highest score a paper can have
-  ylab("Average Standardized EcoReality")
+  ylab("Standardized EcoReality")
 
-ggsave(paste(Sys.Date(), "EcoRealityAverageStandardOverTime.pdf"),
+ggsave(paste(Sys.Date(), "EcoRealityStandardOverTime.pdf"),
        width = 18, height = 14, units = "cm"
 )
 
