@@ -41,4 +41,4 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 
 ### Supporting Information
 
-See GreysonGaitoetal_Intothewild_SupportingInformation.pdf
+See SupportingInformation_Intothewild_GreysonGaitoetal.pdf
