@@ -20,12 +20,12 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 
 ### Folder and file structure
 * data
-    * EcoRealTable_2019-03-25_Data.csv
+    * EcoRealTable_2019-10-09_Data.csv
 * figs
-    * 2019-03-07 CountAnimals.pdf &ndash; Figure 2 in manuscript
-    * 2019-03-07 Eco-realityComparisons.pdf &ndash;  Figure 3 in manuscript
-    * 2019-03-07 Eco-realityAverageStandardOverTime.pdf &ndash; Figure 4 in manuscript
-    * 2019-04-25 CumulativeSumArticles.pdf &ndash; Supporting Information Figure 1
+    * 2019-10-09 CountAnimals.pdf &ndash; Figure 2 in manuscript
+    * 2019-10-09 Eco-realityComparisons.pdf &ndash;  Figure 3 in manuscript
+    * 2019-10-09 Eco-realityAverageStandardOverTime.pdf &ndash; Figure 4 in manuscript
+    * 2019-10-09 CumulativeSumArticles.pdf &ndash; Supporting Information Figure 1
 * .gitignore &ndash; File containing files or folders that git should ignore
 * IntotheWild_Microbiome_Greyson-Gaito_etal_2019.R &ndash; R script for analysis and figure creation
 * GreysonGaitoetal_Intothewild_SupportingInformation.pdf &ndash; Supporting information (search terms, ordinal data scales, figure)

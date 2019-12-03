@@ -1,5 +1,5 @@
 ##############################
-##Into the wild: understanding the breadth of host-microbiome interactions
+##Into the wild: microbiome transplant studies need broader ecological reality
 ##
 ## Christopher J. Greyson-Gaito, Timothy J. Bartley, Karl Cottenie, Will M.C. Jarvis, Amy E.M. Newman, Mason Stothart
 ##
@@ -7,8 +7,11 @@
 ## 
 ## Beginning of coding - 2018-11-19
 ## Version 1.0 - 2019-04-25
+## Version 1.5 - 2019-04-26
+## Version 1.53 - 2019-05-05
+## Version 2.0 - 2019-12-03
 ##
-## As of 2019-04-25, works with R version 3.5.3 (see packages for their versions)
+## As of 2019-12-03, works with R version 3.6.1 (see packages for their versions)
 ##############################
 
 theme_simple <- function() {
@@ -93,7 +96,10 @@ ggsave(paste(Sys.Date(), "CumulativeSumArticles.pdf"),
 
 ## Figures --------
 
-#Figure 1 
+
+# Figure 2 ----------------------------------------------------------------
+
+#Caption: Number of transplant instances over time where the donor or recipient animal was either a lab rodent (mouse or rat) or another animal.
 
 # necessary data frame to add letters to the plot
 ann_fig1 = data.frame(DonorRecip = c("Donor","Recipient"),
@@ -130,7 +136,11 @@ ggsave(paste(Sys.Date(), "CountAnimals.pdf"),
 )
 
 
-## Figure 2
+
+# Figure 3 ----------------------------------------------------------------
+
+# Caption: Number of transplant instances in each experimental condition, separated into whether the recipient animal was a lab rodent or another animal. The X-axis is the level of EcoReality, with 1 always the lowest EcoReality. The levels are explained in our Supporting Information on GitHub (29).
+
 
 ann_fig2 = data.frame(Type = c("Taxon\nMatch","Donor\nEnvironment",
                                "Donor\nPhysiology","Transplanted\nMicrobiome",
@@ -191,7 +201,10 @@ ggsave(paste(Sys.Date(), "EcoRealityComparisons.pdf"),
 )
 
 
-#Figure 3
+# Figure 4 ----------------------------------------------------------------
+
+# Caption: Standardized EcoReality score for each transplant instance.The grey area identifies the zone of EcoReality that has been studied in the literature, and the “Here be Dragons” area is the unexplored zone of EcoReality that is bound at the top by the theoretical maximum standardized EcoReality score of 9.
+
 ecorealpertransplant<-df_Transplant %>%
   dplyr::select(Year,PdFName, `Transplant Instance`, starts_with("EcoReality")) %>%
   mutate(`EcoReality Taxon Match` = ifelse(`EcoReality Taxon Match` == "Match",2,1))%>%
@@ -232,7 +245,7 @@ ggsave(paste(Sys.Date(), "EcoRealityStandardOverTime.pdf"),
        width = 18, height = 14, units = "cm"
 )
 
-##### Useful extra information
+##### Useful extra information --------
 
 # How many of the recipient microbiomes 1 are gnobiotic bees.
 bees <- df_Transplant %>%
