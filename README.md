@@ -36,7 +36,7 @@ Christopher J. Greyson-Gaito<sup>*1,:heavy_plus_sign:</sup>, Timothy J. Bartley<
 ### Instructions for use
 * Download the whole repository (either by forking and cloning or by downloading a ZIP folder)
 * In RStudio, open the project called meta_transplant_microbiome.Rproj and open the file Intothewild_Microbiome_Greyson-Gaito_etal_2019.R
-	* If not using RStudio, open the file Intothewild_Microbiome_Greyson-Gaito_etal_2019.R and edit the path to the data file called Microbiome_Literature_Summaries.csv to whatever path is required on your computer.
+	* If not using RStudio, open the file Intothewild_Microbiome_Greyson-Gaito_etal_2019.R and edit the path to the data file called EcoRealTable_2019-10-09_Data.csv to whatever path is required on your computer.
 * Run the script in RStudio or however you normally run R scripts.
 
 ### Supporting Information
